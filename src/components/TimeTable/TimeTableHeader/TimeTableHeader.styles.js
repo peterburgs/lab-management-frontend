@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   header: {
     display: "flex",
     borderRadius: "8px 8px 0px 0px",

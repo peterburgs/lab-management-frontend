@@ -5,6 +5,7 @@ import useStyles from "./TimeTableContent.styles";
 import Usage from "../Usage/Usage";
 import _ from "lodash";
 import produce from "immer";
+import PropTypes from "prop-types";
 
 const TimeTableContent = (props) => {
   const classes = useStyles();
@@ -20,14 +21,6 @@ const TimeTableContent = (props) => {
       return 3;
     }
   };
-
-  const labs = props.displayedLabUsages.reduce((result, section) => {
-    const labsInSection = section.map((labUsage) => labUsage.lab);
-    result = _.union(result, labsInSection);
-    return result;
-  }, []);
-
-  console.log(labs);
 
   const transformedSections = props.displayedLabUsages.map((section) => {
     const transformedSection = section.reduce((labUsages, currentLabUsage) => {
@@ -45,6 +38,10 @@ const TimeTableContent = (props) => {
                 lecturerName: currentLabUsage.lecturerName,
                 startPeriod: currentLabUsage.startPeriod,
                 endPeriod: currentLabUsage.endPeriod,
+                shift: convertPeriodToShift(
+                  currentLabUsage.startPeriod,
+                  currentLabUsage.endPeriod
+                ),
               },
             ],
           });
@@ -58,6 +55,10 @@ const TimeTableContent = (props) => {
             lecturerName: currentLabUsage.lecturerName,
             startPeriod: currentLabUsage.startPeriod,
             endPeriod: currentLabUsage.endPeriod,
+            shift: convertPeriodToShift(
+              currentLabUsage.startPeriod,
+              currentLabUsage.endPeriod
+            ),
           });
         });
         return labUsages;
@@ -66,142 +67,164 @@ const TimeTableContent = (props) => {
     return transformedSection;
   });
 
-  console.log(transformedSections);
+  const generateLabUsages = (usages) => {
+    const newUsages = _.cloneDeep(usages);
+    newUsages.sort((a, b) => a.shift - b.shift);
 
-  const contents = labs.map((lab) => {
+    //Padding
+    if (newUsages.length === 0) {
+      newUsages.push({ shift: -1 });
+      newUsages.push({ shift: -1 });
+      newUsages.push({ shift: -1 });
+    } else if (newUsages.length === 1) {
+      if (newUsages[0].shift === 1) {
+        newUsages.push({ shift: -1 });
+        newUsages.push({ shift: -1 });
+      }
+      if (newUsages[0].shift === 2) {
+        newUsages.unshift({ shift: -1 });
+        newUsages.push({ shift: -1 });
+      }
+      if (newUsages[0].shift === 3) {
+        newUsages.unshift({ shift: -1 });
+        newUsages.unshift({ shift: -1 });
+      }
+    } else if (newUsages.length === 2) {
+      if (newUsages[0].shift === 1 && newUsages[1].shift === 2) {
+        newUsages.push({ shift: -1 });
+      }
+      if (newUsages[0].shift === 1 && newUsages[1].shift === 3) {
+        newUsages[2] = newUsages[1];
+        newUsages[1] = { shift: -1 };
+      }
+      if (newUsages[0].shift === 2 && newUsages[1].shift === 3) {
+        newUsages.unshift({ shift: -1 });
+      }
+    }
+
     return (
-      <div key={lab} className={classes.row}>
+      <React.Fragment>
+        {newUsages[0].shift === 1 ? (
+          <Grid key={newUsages[0].id} item xs={4} lg={1} md={2}>
+            <Usage
+              courseName={newUsages[0].courseName}
+              lecturerName={newUsages[0].lecturerName}
+              startPeriod={newUsages[0].startPeriod}
+              endPeriod={newUsages[0].endPeriod}
+              index={newUsages[0].shift}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={4} lg={1} md={2} />
+        )}
+        {newUsages[1].shift === 2 ? (
+          <Grid key={newUsages[1].id} item xs={4} lg={1} md={2}>
+            <Usage
+              courseName={newUsages[1].courseName}
+              lecturerName={newUsages[1].lecturerName}
+              startPeriod={newUsages[1].startPeriod}
+              endPeriod={newUsages[1].endPeriod}
+              index={newUsages[1].shift}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={4} lg={1} md={2} />
+        )}
+        {newUsages[2].shift === 3 ? (
+          <Grid key={newUsages[2].id} item xs={4} lg={1} md={2}>
+            <Usage
+              courseName={newUsages[2].courseName}
+              lecturerName={newUsages[2].lecturerName}
+              startPeriod={newUsages[2].startPeriod}
+              endPeriod={newUsages[2].endPeriod}
+              index={newUsages[2].shift}
+            />
+          </Grid>
+        ) : (
+          <Grid item xs={4} lg={1} md={2} />
+        )}
+      </React.Fragment>
+    );
+  };
+
+  const contents = props.displayedLabs.map((lab) => {
+    return (
+      <div key={lab.id} className={classes.row}>
         <div className={classes.labNameColumn}>
-          <Lab name={lab} />
+          <Lab name={lab.name} />
         </div>
         <Grid wrap="nowrap" container spacing={0}>
-          {transformedSections[0]
-            ? transformedSections[0]
-                .find((labUsages) => labUsages.lab === lab)
-                .usages.map((usage) => (
-                  <Grid key={usage.id} item xs={4} lg={1} md={2}>
-                    <Usage
-                      courseName={usage.courseName}
-                      lecturerName={usage.lecturerName}
-                      startPeriod={usage.startPeriod}
-                      endPeriod={usage.endPeriod}
-                      index={convertPeriodToShift(
-                        usage.startPeriod,
-                        usage.endPeriod
-                      )}
-                    />
-                  </Grid>
-                ))
-            : null}
-          {/* Padding */}
-          {[
-            ...Array(
-              3 -
-                (transformedSections[0]
-                  ? transformedSections[0].find(
-                      (labUsages) => labUsages.lab === lab
-                    ).usages.length
-                  : 0)
-            ),
-          ].map((_, index) => {
-            return <Grid key={`padding-0-${index}`} item xs={4} lg={1} md={2} />;
-          })}
+          {transformedSections[0] ? (
+            transformedSections[0].find(
+              (labUsages) => labUsages.lab === lab.name
+            ) ? (
+              generateLabUsages(
+                transformedSections[0].find(
+                  (labUsages) => labUsages.lab === lab.name
+                ).usages
+              )
+            ) : (
+              <React.Fragment>
+                <Grid item xs={4} lg={1} md={2} />
+                <Grid item xs={4} lg={1} md={2} />
+                <Grid item xs={4} lg={1} md={2} />
+              </React.Fragment>
+            )
+          ) : null}
           <Hidden smDown implementation="js">
-            {transformedSections[1]
-              ? transformedSections[1]
-                  .find((labUsages) => labUsages.lab === lab)
-                  .usages.map((usage) => (
-                    <Grid key={usage.id} item xs={4} lg={1} md={2}>
-                      <Usage
-                        courseName={usage.courseName}
-                        lecturerName={usage.lecturerName}
-                        startPeriod={usage.startPeriod}
-                        endPeriod={usage.endPeriod}
-                        index={convertPeriodToShift(
-                          usage.startPeriod,
-                          usage.endPeriod
-                        )}
-                      />
-                    </Grid>
-                  ))
-              : null}
-            {/* Padding */}
-            {[
-              ...Array(
-                3 -
-                  (transformedSections[1]
-                    ? transformedSections[1].find(
-                        (labUsages) => labUsages.lab === lab
-                      ).usages.length
-                    : 0)
-              ),
-            ].map((_, index) => {
-              return <Grid key={`padding-1-${index}`} item xs={4} lg={1} md={2} />;
-            })}
+            {transformedSections[1] ? (
+              transformedSections[1].find(
+                (labUsages) => labUsages.lab === lab.name
+              ) ? (
+                generateLabUsages(
+                  transformedSections[1].find(
+                    (labUsages) => labUsages.lab === lab.name
+                  ).usages
+                )
+              ) : (
+                <React.Fragment>
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                </React.Fragment>
+              )
+            ) : null}
           </Hidden>
           <Hidden mdDown implementation="js">
-            {transformedSections[2]
-              ? transformedSections[2]
-                  .find((labUsages) => labUsages.lab === lab)
-                  .usages.map((usage) => (
-                    <Grid key={usage.id} item xs={4} lg={1} md={2}>
-                      <Usage
-                        courseName={usage.courseName}
-                        lecturerName={usage.lecturerName}
-                        startPeriod={usage.startPeriod}
-                        endPeriod={usage.endPeriod}
-                        index={convertPeriodToShift(
-                          usage.startPeriod,
-                          usage.endPeriod
-                        )}
-                      />
-                    </Grid>
-                  ))
-              : null}
-            {/* Padding */}
-            {[
-              ...Array(
-                3 -
-                  (transformedSections[2]
-                    ? transformedSections[2].find(
-                        (labUsages) => labUsages.lab === lab
-                      ).usages.length
-                    : 0)
-              ),
-            ].map((_, index) => {
-              return <Grid key={`padding-2-${index}`} item xs={4} lg={1} md={2} />;
-            })}
-            {transformedSections[3]
-              ? transformedSections[3]
-                  .find((labUsages) => labUsages.lab === lab)
-                  .usages.map((usage) => (
-                    <Grid key={usage.id} item xs={4} lg={1} md={2}>
-                      <Usage
-                        courseName={usage.courseName}
-                        lecturerName={usage.lecturerName}
-                        startPeriod={usage.startPeriod}
-                        endPeriod={usage.endPeriod}
-                        index={convertPeriodToShift(
-                          usage.startPeriod,
-                          usage.endPeriod
-                        )}
-                      />
-                    </Grid>
-                  ))
-              : null}
-            {/* Padding */}
-            {[
-              ...Array(
-                3 -
-                  (transformedSections[3]
-                    ? transformedSections[3].find(
-                        (labUsages) => labUsages.lab === lab
-                      ).usages.length
-                    : 0)
-              ),
-            ].map((_, index) => {
-              return <Grid key={`padding-3-${index}`} item xs={4} lg={1} md={2} />;
-            })}
+            {transformedSections[2] ? (
+              transformedSections[2].find(
+                (labUsages) => labUsages.lab === lab.name
+              ) ? (
+                generateLabUsages(
+                  transformedSections[2].find(
+                    (labUsages) => labUsages.lab === lab.name
+                  ).usages
+                )
+              ) : (
+                <React.Fragment>
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                </React.Fragment>
+              )
+            ) : null}
+            {transformedSections[3] ? (
+              transformedSections[3].find(
+                (labUsages) => labUsages.lab === lab.name
+              ) ? (
+                generateLabUsages(
+                  transformedSections[3].find(
+                    (labUsages) => labUsages.lab === lab.name
+                  ).usages
+                )
+              ) : (
+                <React.Fragment>
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                  <Grid item xs={4} lg={1} md={2} />
+                </React.Fragment>
+              )
+            ) : null}
           </Hidden>
         </Grid>
       </div>
@@ -213,6 +236,11 @@ const TimeTableContent = (props) => {
       {contents}
     </Paper>
   );
+};
+
+TimeTableContent.propTypes = {
+  displayedLabUsages: PropTypes.array.isRequired,
+  displayedLabs: PropTypes.array.isRequired,
 };
 
 export default TimeTableContent;

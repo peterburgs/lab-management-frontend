@@ -4,6 +4,7 @@ import TimeTableContent from "./TimeTableContent/TimeTableContent";
 import TimeTableHeader from "./TimeTableHeader/TimeTableHeader";
 import NavigateBefore from "@material-ui/icons/NavigateBefore";
 import NavigateNext from "@material-ui/icons/NavigateNext";
+import PropTypes from "prop-types";
 
 import useStyles from "./TimeTable.styles";
 
@@ -23,9 +24,22 @@ const TimeTable = (props) => {
         </IconButton>
       </div>
       <TimeTableHeader displayedDays={props.displayedDays} />
-      <TimeTableContent displayedLabUsages={props.displayedLabUsages} />
+      <TimeTableContent
+        displayedLabs={props.displayedLabs}
+        displayedLabUsages={props.displayedLabUsages}
+      />
     </Paper>
   );
+};
+
+TimeTable.propTypes = {
+  displayedLabUsages: PropTypes.array.isRequired,
+  displayedDays: PropTypes.array.isRequired,
+  displayedLabs: PropTypes.array.isRequired,
+  isPrev: PropTypes.bool.isRequired,
+  onPrev: PropTypes.func.isRequired,
+  isNext: PropTypes.bool.isRequired,
+  onNext: PropTypes.func.isRequired,
 };
 
 export default TimeTable;

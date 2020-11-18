@@ -1,6 +1,7 @@
 import { Grid, Paper, Typography, Hidden } from "@material-ui/core";
 import React from "react";
 import useStyles from "./TimeTableHeader.styles";
+import PropTypes from "prop-types";
 
 const TimeTableHeader = (props) => {
   const classes = useStyles();
@@ -65,6 +66,10 @@ const TimeTableHeader = (props) => {
       </Grid>
     </Paper>
   );
+};
+
+TimeTableHeader.propTypes = {
+  displayedDays: PropTypes.array.isRequired,
 };
 
 export default TimeTableHeader;

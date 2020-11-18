@@ -1,12 +1,12 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   timeTable: {
     marginTop: "1rem",
   },
   navigation: {
     display: "flex",
     width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   }
 }));
