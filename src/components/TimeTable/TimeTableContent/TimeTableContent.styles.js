@@ -5,6 +5,9 @@ export default makeStyles((theme) => ({
     marginTop: "0.5rem",
     display: "flex",
     flexDirection: 'column',
+    maxHeight: 500,
+    overflowY: 'scroll',
+    overflowX: 'hidden',
   },
   labNameColumn: {
     minWidth: 80,

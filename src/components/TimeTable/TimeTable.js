@@ -23,7 +23,7 @@ const TimeTable = (props) => {
         </IconButton>
       </div>
       <TimeTableHeader displayedDays={props.displayedDays} />
-      <TimeTableContent displayedLabUsages={props.displayedLabUsages} />
+      <TimeTableContent displayedLabs={props.displayedLabs} displayedLabUsages={props.displayedLabUsages} />
     </Paper>
   );
 };

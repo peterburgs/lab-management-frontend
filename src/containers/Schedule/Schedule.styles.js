@@ -2,11 +2,15 @@ import { makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles((theme) => ({
   schedule: {
-    paddingTop: 24,
+    paddingTop: 12,
   },
   button: {
     textTransform: "none",
     height: "auto",
+    [theme.breakpoints.down('sm')]: {
+      width: '100%',
+      marginBottom: '0.5rem',
+    }
   },
   toolbarLeft: {
     display: "flex",

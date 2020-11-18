@@ -16,7 +16,7 @@ import AccountCircle from "@material-ui/icons/AccountCircle";
 import RequestPending from "../components/RequestPending/RequestPending";
 
 const Layout = (props) => {
-  const [sideBarOpened, setSideBarOpened] = useState(false);
+  const [sideBarOpened, setSideBarOpened] = useState(true);
   const [sideBarMobileOpened, setSideBarMobileOpened] = useState(false);
 
   const classes = useStyles();
@@ -61,7 +61,7 @@ const Layout = (props) => {
             >
               <MenuIcon />
             </IconButton>
-            <RequestPending>Request 123 is pending</RequestPending>
+            <RequestPending />
             <div className={classes.grow}></div>
             <div className={classes.userSection}>
               <IconButton
@@ -85,7 +85,7 @@ const Layout = (props) => {
           </Toolbar>
         </AppBar>
       </ElevationScroll>
-      <main className={classes.content}>{props.children}</main>
+      <main className={classes.content} >{props.children}</main>
     </React.Fragment>
   );
 };

@@ -8,9 +8,8 @@ export default makeStyles((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "flex-start",
-    minWidth: 270,
     "& button": {
-      marginLeft: "auto",
+      marginLeft: "0.5rem",
       textTransform: "none",
       fontSize: 12,
       border:"#fff 1px solid",
@@ -22,6 +21,7 @@ export default makeStyles((theme) => ({
     },
     "& p": {
       color: "white",
+      fontSize: 12,
     },
     [theme.breakpoints.down("sm")]: {
       background: "#F0F2F5",

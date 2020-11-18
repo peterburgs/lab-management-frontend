@@ -8,9 +8,8 @@ const RequestPending = (props) => {
 
   return (
     <Paper className={classes.requestPending}>
-      <ErrorRoundedIcon />
       <Typography>
-        {props.children}
+        A request is pending
       </Typography>
       <Button variant="contained" color="secondary" disableElevation>
         Continue

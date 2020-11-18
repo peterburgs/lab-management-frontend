@@ -9,7 +9,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import useStyles from "./Schedule.styles";
-import EditIcon from "@material-ui/icons/Edit";
+import AddIcon from "@material-ui/icons/Add";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "../../components/TimeTable/TimeTable";
 
@@ -79,7 +79,7 @@ const useWindowResize = () => {
   return [windowSize, currentPos, setCurrentPos];
 };
 
-const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
+const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages, week) => {
   const [isPrev, setIsPrev] = useState(true);
   const [isNext, setIsNext] = useState(true);
   const [displayedDays, setDisplayedDays] = useState([]);
@@ -90,7 +90,10 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
     if (windowSize === "sm" || windowSize === "xs") {
       const updatedDisplayedLabUsages = [];
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos && labUsage.week === week
+        )
       );
 
       setDisplayedLabUsages(updatedDisplayedLabUsages);
@@ -105,10 +108,16 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
     if (windowSize === "md") {
       const updatedDisplayedLabUsages = [];
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos && labUsage.week === week
+        )
       );
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos + 1)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos + 1 && labUsage.week === week
+        )
       );
 
       setDisplayedLabUsages(updatedDisplayedLabUsages);
@@ -124,16 +133,28 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
     if (windowSize === "lg" || windowSize === "xl") {
       const updatedDisplayedLabUsages = [];
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos && labUsage.week === week
+        )
       );
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos + 1)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos + 1 && labUsage.week === week
+        )
       );
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos + 2)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos + 2 && labUsage.week === week
+        )
       );
       updatedDisplayedLabUsages.push(
-        labUsages.filter((labUsage) => labUsage.dayOfWeek === currentPos + 3)
+        labUsages.filter(
+          (labUsage) =>
+            labUsage.dayOfWeek === currentPos + 3 && labUsage.week === week
+        )
       );
 
       setDisplayedLabUsages(updatedDisplayedLabUsages);
@@ -149,13 +170,21 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
       setIsNext(currentPos < 2);
     }
     setIsPrev(currentPos > 0);
-  }, [currentPos, windowSize, labUsages]);
+  }, [currentPos, windowSize, labUsages, week]);
 
   const handleNext = () => {
-    setCurrentPos((prevPos) => (prevPos += 1));
+    if (windowSize === "lg" || windowSize === "md") {
+      setCurrentPos((prevPos) => (prevPos += 2));
+    } else {
+      setCurrentPos((prevPos) => (prevPos += 1));
+    }
   };
   const handlePrev = () => {
-    setCurrentPos((prevPos) => (prevPos -= 1));
+    if (windowSize === "lg" || windowSize === "md") {
+      setCurrentPos((prevPos) => (prevPos -= 2));
+    } else {
+      setCurrentPos((prevPos) => (prevPos -= 1));
+    }
   };
 
   return [
@@ -168,8 +197,30 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages) => {
   ];
 };
 
-const Schedule = () => {
+const Schedule = (props) => {
   const classes = useStyles();
+  const [labs, setLabs] = useState([
+    {
+      id: 1,
+      name: "A3-102",
+    },
+    {
+      id: 2,
+      name: "A3-103",
+    },
+    {
+      id: 3,
+      name: "A3-104",
+    },
+    {
+      id: 4,
+      name: "A3-105",
+    },
+    {
+      id: 5,
+      name: "A3-106",
+    },
+  ]);
   const [labUsages, setLabUsages] = useState([
     {
       id: "1123",
@@ -177,8 +228,9 @@ const Schedule = () => {
       dayOfWeek: 0,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Monday",
-      lecturerName: "abc",
+      courseName: "Web Programming",
+      lecturerName: "Nguyen Duc Khoan",
+      week: 1,
     },
     {
       id: "1124",
@@ -186,8 +238,39 @@ const Schedule = () => {
       dayOfWeek: 0,
       startPeriod: 6,
       endPeriod: 8,
-      courseName: "Monday",
-      lecturerName: "abc",
+      courseName: "New Technology",
+      lecturerName: "Le Vinh Thinh",
+      week: 2,
+    },
+    {
+      id: "1200",
+      lab: "A3-103",
+      dayOfWeek: 0,
+      startPeriod: 13,
+      endPeriod: 15,
+      courseName: "System Testing",
+      lecturerName: "Nguyen Tran Thi Van",
+      week: 1,
+    },
+    {
+      id: "1201",
+      lab: "A3-104",
+      dayOfWeek: 0,
+      startPeriod: 13,
+      endPeriod: 15,
+      courseName: "Software Project Management",
+      lecturerName: "Nguyen Duc Khoan",
+      week: 1,
+    },
+    {
+      id: "1202",
+      lab: "A3-105",
+      dayOfWeek: 0,
+      startPeriod: 13,
+      endPeriod: 15,
+      courseName: "Machine Learning",
+      lecturerName: "Nguyen Thien Bao",
+      week: 1,
     },
     {
       id: "1125",
@@ -195,8 +278,9 @@ const Schedule = () => {
       dayOfWeek: 1,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Tuesday",
-      lecturerName: "abc",
+      courseName: "Windows Programming",
+      lecturerName: "Le Vinh Thinh",
+      week: 1,
     },
     {
       id: "1126",
@@ -204,8 +288,9 @@ const Schedule = () => {
       dayOfWeek: 2,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Wednesday",
-      lecturerName: "abc",
+      courseName: "Networking Essentials",
+      lecturerName: "Nguyen Dang Quang",
+      week: 1,
     },
     {
       id: "1127",
@@ -213,8 +298,9 @@ const Schedule = () => {
       dayOfWeek: 3,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Thursday",
-      lecturerName: "abc",
+      courseName: "Windows Programming",
+      lecturerName: "Le Van Vinh",
+      week: 1,
     },
     {
       id: "1128",
@@ -222,8 +308,9 @@ const Schedule = () => {
       dayOfWeek: 4,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Friday",
-      lecturerName: "abc",
+      courseName: "Programming Techniques",
+      lecturerName: "Nguyen Thien Bao",
+      week: 1,
     },
     {
       id: "1129",
@@ -231,11 +318,13 @@ const Schedule = () => {
       dayOfWeek: 5,
       startPeriod: 1,
       endPeriod: 3,
-      courseName: "Saturday",
-      lecturerName: "abc",
+      courseName: "Database System",
+      lecturerName: "C.Chau",
+      week: 1,
     },
   ]);
 
+  const [week, setWeek] = useState(1);
   const [windowSize, currentPos, setCurrentPos] = useWindowResize();
   const [
     handlePrev,
@@ -244,23 +333,23 @@ const Schedule = () => {
     isNext,
     isPrev,
     displayedDays,
-  ] = useSwipe(windowSize, currentPos, setCurrentPos, labUsages);
+  ] = useSwipe(windowSize, currentPos, setCurrentPos, labUsages, week);
 
   return (
     <div className={classes.schedule}>
       <Grid container spacing={0}>
         <Grid className={classes.toolbarLeft} item container spacing={1} lg={7}>
-          <Grid item>
+          <Grid item xs={12} sm={'auto'}>
             <Button
               className={classes.button}
               variant="contained"
               color="primary"
-              startIcon={<EditIcon />}
+              startIcon={<AddIcon />}
             >
-              Edit lab usage
+              Add lab usage
             </Button>
           </Grid>
-          <Grid item>
+          <Grid item xs={12} sm={'auto'}>
             <Button
               className={classes.button}
               variant="contained"
@@ -270,7 +359,7 @@ const Schedule = () => {
               Export lab usage
             </Button>
           </Grid>
-          <Grid item>
+          <Grid item xs={12} sm={'auto'}>
             <Button
               className={classes.button}
               variant="contained"
@@ -287,28 +376,25 @@ const Schedule = () => {
             <Select
               labelId="demo-simple-select-outlined-label"
               id="demo-simple-select-outlined"
-              // value={week}
-              // onChange={handleChange}
+              value={week}
+              onChange={(e) => setWeek(e.target.value)}
               label="Week"
             >
-              <MenuItem value="">
-                <em>None</em>
-              </MenuItem>
-              <MenuItem value={1}>Week 1</MenuItem>
-              <MenuItem value={2}>Week 2</MenuItem>
-              <MenuItem value={3}>Week 3</MenuItem>
-              <MenuItem value={4}>Week 4</MenuItem>
-              <MenuItem value={5}>Week 5</MenuItem>
-              <MenuItem value={6}>Week 6</MenuItem>
-              <MenuItem value={7}>Week 7</MenuItem>
-              <MenuItem value={8}>Week 8</MenuItem>
-              <MenuItem value={9}>Week 9</MenuItem>
-              <MenuItem value={10}>Week 10</MenuItem>
-              <MenuItem value={11}>Week 11</MenuItem>
-              <MenuItem value={12}>Week 12</MenuItem>
-              <MenuItem value={13}>Week 13</MenuItem>
-              <MenuItem value={14}>Week 14</MenuItem>
-              <MenuItem value={15}>Week 15</MenuItem>
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={6}>6</MenuItem>
+              <MenuItem value={7}>7</MenuItem>
+              <MenuItem value={8}>8</MenuItem>
+              <MenuItem value={9}>9</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={11}>11</MenuItem>
+              <MenuItem value={12}>12</MenuItem>
+              <MenuItem value={13}>13</MenuItem>
+              <MenuItem value={14}>14</MenuItem>
+              <MenuItem value={15}>15</MenuItem>
             </Select>
           </FormControl>
           <Typography>From Oct 1st, 2020 To Oct 6th, 2020</Typography>
@@ -321,6 +407,7 @@ const Schedule = () => {
             onNext={handleNext}
             displayedDays={displayedDays}
             displayedLabUsages={displayedLabUsages}
+            displayedLabs={labs}
           />
         </Grid>
       </Grid>

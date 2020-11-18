@@ -7,6 +7,6 @@ export default makeStyles((theme) => ({
   navigation: {
     display: "flex",
     width: '100%',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
   }
 }));
