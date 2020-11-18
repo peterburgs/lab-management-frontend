@@ -1,24 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import Layout from "./hoc/Layout";
+import useStyles from "./App.styles";
+import { ThemeProvider, createMuiTheme } from "@material-ui/core";
+
+import "fontsource-roboto";
+
+import Schedule from './containers/Schedule/Schedule';
+
+const theme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#1A73E8",
+    },
+    secondary: {
+      main: '#e7305b',
+    },
+  },
+  typography: {
+    fontFamily: "Roboto",
+    fontSize: 12,
+  },
+});
 
 function App() {
+  const classes = useStyles();
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <ThemeProvider theme={theme}>
+      <div className={classes.app}>
+        <Layout>
+          <Schedule />
+        </Layout>
+      </div>
+    </ThemeProvider>
   );
 }
 
