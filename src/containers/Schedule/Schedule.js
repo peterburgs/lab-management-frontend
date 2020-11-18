@@ -12,7 +12,6 @@ import useStyles from "./Schedule.styles";
 import EditIcon from "@material-ui/icons/Edit";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "../../components/TimeTable/TimeTable";
-import produce from "immer";
 
 const useWindowResize = () => {
   const [windowSize, setWindowSize] = useState("");
