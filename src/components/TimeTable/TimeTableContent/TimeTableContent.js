@@ -5,6 +5,7 @@ import useStyles from "./TimeTableContent.styles";
 import Usage from "../Usage/Usage";
 import _ from "lodash";
 import produce from "immer";
+import PropTypes from "prop-types";
 
 const TimeTableContent = (props) => {
   const classes = useStyles();
@@ -235,6 +236,11 @@ const TimeTableContent = (props) => {
       {contents}
     </Paper>
   );
+};
+
+TimeTableContent.propTypes = {
+  displayedLabUsages: PropTypes.array.isRequired,
+  displayedLabs: PropTypes.array.isRequired,
 };
 
 export default TimeTableContent;

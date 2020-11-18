@@ -14,6 +14,7 @@ import ElevationScroll from "../components/ElevationScroll/ElevationScroll";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircle from "@material-ui/icons/AccountCircle";
 import RequestPending from "../components/RequestPending/RequestPending";
+import PropTypes from "prop-types";
 
 const Layout = (props) => {
   const [sideBarOpened, setSideBarOpened] = useState(true);
@@ -85,9 +86,13 @@ const Layout = (props) => {
           </Toolbar>
         </AppBar>
       </ElevationScroll>
-      <main className={classes.content} >{props.children}</main>
+      <main className={classes.content}>{props.children}</main>
     </React.Fragment>
   );
+};
+
+Layout.propTypes = {
+  children: PropTypes.object.isRequired,
 };
 
 export default Layout;

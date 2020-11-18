@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   usage: {
     display: "flex",
     flexDirection: "column",
@@ -30,5 +30,10 @@ export default makeStyles((theme) => ({
     paddingBottom: "0.9rem",
     boxSizing: "border-box",
     wordWrap: "break-word",
+  },
+  editIcon: {
+    padding: 0,
+    width: 10,
+    justifySelf: 'end',
   },
 }));

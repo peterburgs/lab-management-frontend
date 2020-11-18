@@ -5,6 +5,7 @@ export default makeStyles((theme) => ({
     paddingTop: 12,
   },
   button: {
+    borderRadius: 8,
     textTransform: "none",
     height: "auto",
     [theme.breakpoints.down('sm')]: {
@@ -34,4 +35,11 @@ export default makeStyles((theme) => ({
     margin: `0 0.5rem`,
     minWidth: 120,
   },
+  formElement: {
+    marginBottom: '1rem',
+    width: "100%",
+  },
+  dialog: {
+    borderRadius: 16,
+  }
 }));

@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   content: {
     marginTop: "0.5rem",
     display: "flex",

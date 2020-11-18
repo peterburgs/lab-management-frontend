@@ -7,11 +7,18 @@ import {
   MenuItem,
   InputLabel,
   Typography,
+  Slide,
 } from "@material-ui/core";
 import useStyles from "./Schedule.styles";
 import AddIcon from "@material-ui/icons/Add";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "../../components/TimeTable/TimeTable";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogContentText from "@material-ui/core/DialogContentText";
+import DialogTitle from "@material-ui/core/DialogTitle";
 
 const useWindowResize = () => {
   const [windowSize, setWindowSize] = useState("");
@@ -19,9 +26,9 @@ const useWindowResize = () => {
 
   const debounce = (fn, ms) => {
     let timer;
-    return (_) => {
+    return () => {
       clearTimeout(timer);
-      timer = setTimeout((_) => {
+      timer = setTimeout(() => {
         timer = null;
         fn.apply(this);
       }, ms);
@@ -197,9 +204,19 @@ const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages, week) => {
   ];
 };
 
-const Schedule = (props) => {
+const useDialog = () => {
+  const [isOpenDialog, setIsOpenDialog] = useState(false);
+
+  return [isOpenDialog, setIsOpenDialog];
+};
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
+
+const Schedule = () => {
   const classes = useStyles();
-  const [labs, setLabs] = useState([
+  const [labs] = useState([
     {
       id: 1,
       name: "A3-102",
@@ -221,7 +238,7 @@ const Schedule = (props) => {
       name: "A3-106",
     },
   ]);
-  const [labUsages, setLabUsages] = useState([
+  const [labUsages] = useState([
     {
       id: "1123",
       lab: "A3-102",
@@ -335,21 +352,196 @@ const Schedule = (props) => {
     displayedDays,
   ] = useSwipe(windowSize, currentPos, setCurrentPos, labUsages, week);
 
+  const [isOpenDialog, setIsOpenDialog] = useDialog();
+
   return (
     <div className={classes.schedule}>
+      <Dialog
+        classes={{ paper: classes.dialog }}
+        open={isOpenDialog}
+        TransitionComponent={Transition}
+        onClose={() => setIsOpenDialog(false)}
+        aria-labelledby="form-dialog-title"
+      >
+        <DialogTitle id="form-dialog-title">Add a lab usage</DialogTitle>
+        <DialogContent>
+          <DialogContentText>Teaching Information</DialogContentText>
+          <TextField
+            required
+            id="outlined-required"
+            label="Course ID"
+            variant="outlined"
+            className={classes.formElement}
+          />
+          <TextField
+            required
+            id="outlined-required"
+            label="Group"
+            variant="outlined"
+            className={classes.formElement}
+          />
+          <TextField
+            required
+            id="outlined-required"
+            label="Lecturer ID"
+            variant="outlined"
+            className={classes.formElement}
+          />
+          <DialogContentText>Teaching time</DialogContentText>
+          <FormControl variant="outlined" className={classes.formElement}>
+            <InputLabel id="demo-simple-select-outlined-label">Week</InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              // value={week}
+              // onChange={handleChange}
+              label="Week"
+            >
+              <MenuItem value={1}>1</MenuItem>
+              <MenuItem value={2}>2</MenuItem>
+              <MenuItem value={3}>3</MenuItem>
+              <MenuItem value={4}>4</MenuItem>
+              <MenuItem value={5}>5</MenuItem>
+              <MenuItem value={6}>6</MenuItem>
+              <MenuItem value={7}>7</MenuItem>
+              <MenuItem value={8}>8</MenuItem>
+              <MenuItem value={9}>9</MenuItem>
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={11}>11</MenuItem>
+              <MenuItem value={12}>12</MenuItem>
+              <MenuItem value={13}>13</MenuItem>
+              <MenuItem value={14}>14</MenuItem>
+              <MenuItem value={15}>15</MenuItem>
+            </Select>
+          </FormControl>
+          <Grid container spacing={1}>
+            <Grid item xs={6}>
+              <FormControl variant="outlined" className={classes.formElement}>
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Day of week
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  // value={dayOfWeek}
+                  // onChange={handleChange}
+                  label="Day of week"
+                >
+                  <MenuItem value={0}>Monday</MenuItem>
+                  <MenuItem value={1}>Tuesday</MenuItem>
+                  <MenuItem value={2}>Wednesday</MenuItem>
+                  <MenuItem value={3}>Thursday</MenuItem>
+                  <MenuItem value={4}>Friday</MenuItem>
+                  <MenuItem value={5}>Saturday</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid item xs={3}>
+              <FormControl variant="outlined" className={classes.formElement}>
+                <InputLabel id="demo-simple-select-outlined-label">
+                  Start period
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  // value={week}
+                  // onChange={handleChange}
+                  label="Start period"
+                >
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={6}>6</MenuItem>
+                  <MenuItem value={7}>7</MenuItem>
+                  <MenuItem value={8}>8</MenuItem>
+                  <MenuItem value={9}>9</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={11}>11</MenuItem>
+                  <MenuItem value={12}>12</MenuItem>
+                  <MenuItem value={13}>13</MenuItem>
+                  <MenuItem value={14}>14</MenuItem>
+                  <MenuItem value={15}>15</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+
+            <Grid item xs={3}>
+              <FormControl variant="outlined" className={classes.formElement}>
+                <InputLabel id="demo-simple-select-outlined-label">
+                  End period
+                </InputLabel>
+                <Select
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  // value={week}
+                  // onChange={handleChange}
+                  label="End period"
+                >
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={6}>6</MenuItem>
+                  <MenuItem value={7}>7</MenuItem>
+                  <MenuItem value={8}>8</MenuItem>
+                  <MenuItem value={9}>9</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={11}>11</MenuItem>
+                  <MenuItem value={12}>12</MenuItem>
+                  <MenuItem value={13}>13</MenuItem>
+                  <MenuItem value={14}>14</MenuItem>
+                  <MenuItem value={15}>15</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+          </Grid>
+          <DialogContentText>Choose lab to change</DialogContentText>
+
+          <FormControl variant="outlined" className={classes.formElement}>
+            <InputLabel id="demo-simple-select-outlined-label">Lab</InputLabel>
+            <Select
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-outlined"
+              // value={week}
+              // onChange={handleChange}
+              label="Lab"
+            >
+              <MenuItem value={'A3-102'}>A3-102</MenuItem>
+            </Select>
+          </FormControl>
+        </DialogContent>
+        <DialogActions style={{ padding: "8px 24px" }}>
+          <Button onClick={() => setIsOpenDialog(false)} color="primary">
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            disableElevation
+            style={{ borderRadius: 8 }}
+            onClick={() => setIsOpenDialog(false)}
+            color="primary"
+          >
+            Submit
+          </Button>
+        </DialogActions>
+      </Dialog>
       <Grid container spacing={0}>
         <Grid className={classes.toolbarLeft} item container spacing={1} lg={7}>
-          <Grid item xs={12} sm={'auto'}>
+          <Grid item xs={12} sm={"auto"}>
             <Button
               className={classes.button}
               variant="contained"
               color="primary"
               startIcon={<AddIcon />}
+              onClick={() => setIsOpenDialog(true)}
             >
               Add lab usage
             </Button>
           </Grid>
-          <Grid item xs={12} sm={'auto'}>
+          <Grid item xs={12} sm={"auto"}>
             <Button
               className={classes.button}
               variant="contained"
@@ -359,7 +551,7 @@ const Schedule = (props) => {
               Export lab usage
             </Button>
           </Grid>
-          <Grid item xs={12} sm={'auto'}>
+          <Grid item xs={12} sm={"auto"}>
             <Button
               className={classes.button}
               variant="contained"
