@@ -36,7 +36,7 @@ const SideBar = (props) => {
               <path d="M19.2188 7.57516H11.1719C10.7404 7.57516 10.3906 7.9205 10.3906 8.34652V19.6084C10.3906 20.0344 10.7404 20.3797 11.1719 20.3797H19.2188C19.6502 20.3797 20 20.0344 20 19.6084V8.34652C20 7.9205 19.6502 7.57516 19.2188 7.57516ZM18.4375 18.837H11.9531V9.11788H18.4375V18.837Z" />
             </svg>
           }
-          link="/"
+          link="/registration"
         >
           Registration
         </NavigationItem>
@@ -217,7 +217,7 @@ SideBar.propTypes = {
   open: PropTypes.bool.isRequired,
   mobileOpen: PropTypes.bool.isRequired,
   onMobileToggle: PropTypes.func.isRequired,
-  window: PropTypes.object.isRequired,
+  window: PropTypes.object,
   onToggle: PropTypes.func.isRequired,
 };
 

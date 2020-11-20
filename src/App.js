@@ -1,11 +1,17 @@
-import React from "react";
+/* eslint-disable react/prop-types */
+import React, { Suspense } from "react";
 import Layout from "./hoc/Layout";
 import useStyles from "./App.styles";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core";
+import { Switch, Route } from "react-router-dom";
+import { CircularProgress } from "@material-ui/core";
 
 import "fontsource-roboto";
 
-import Schedule from "./containers/Schedule/Schedule";
+const Schedule = React.lazy(() => import("./containers/Schedule/Schedule"));
+const Registration = React.lazy(() =>
+  import("./containers/Registration/Registration")
+);
 
 const theme = createMuiTheme({
   palette: {
@@ -24,13 +30,27 @@ const theme = createMuiTheme({
 
 function App() {
   const classes = useStyles();
+  let routes = (
+    <Switch>
+      <Route path="/schedule">
+        <Layout>
+          <Suspense fallback={<CircularProgress />}>
+            <Schedule />
+          </Suspense>
+        </Layout>
+      </Route>
+      <Route path="/registration">
+        <Layout registrationPage>
+          <Suspense fallback={<CircularProgress />}>
+            <Registration />
+          </Suspense>
+        </Layout>
+      </Route>
+    </Switch>
+  );
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.app}>
-        <Layout>
-          <Schedule />
-        </Layout>
-      </div>
+      <div className={classes.app}>{routes}</div>
     </ThemeProvider>
   );
 }
