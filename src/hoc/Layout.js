@@ -51,6 +51,7 @@ const Layout = (props) => {
           position="fixed"
           className={clsx(classes.appBar, {
             [classes.appBarShift]: sideBarOpened,
+            [classes.appBarRegistration]: props.registrationPage,
           })}
         >
           <Toolbar>
@@ -64,7 +65,11 @@ const Layout = (props) => {
             </IconButton>
             <RequestPending />
             <div className={classes.grow}></div>
-            <div className={classes.userSection}>
+            <div
+              className={clsx(classes.userSection, {
+                [classes.userSectionRegistration]: props.registrationPage,
+              })}
+            >
               <IconButton
                 aria-label="show 17 new notifications"
                 color="inherit"
@@ -93,6 +98,7 @@ const Layout = (props) => {
 
 Layout.propTypes = {
   children: PropTypes.object.isRequired,
+  registrationPage: PropTypes.bool,
 };
 
 export default Layout;

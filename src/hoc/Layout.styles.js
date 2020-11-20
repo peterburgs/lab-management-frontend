@@ -4,6 +4,17 @@ const sideBarOpenWidth = 225;
 const sideBarCloseWidth = 60;
 
 export default makeStyles((theme) => ({
+  appBarRegistration: {
+    backgroundColor: "#1A73E8 !important",
+  },
+  userSectionRegistration: {
+    "& p": {
+      color: "#fff !important",
+    },
+    "& svg": {
+      color: "#fff !important",
+    },
+  },
   appBar: {
     minHeight: 56,
     [theme.breakpoints.up("md")]: {
@@ -39,8 +50,7 @@ export default makeStyles((theme) => ({
   },
   content: {
     flexGrow: 1,
-    height: "100vh",
-    background: "#F0F2F5",
+    minWidth: 369,
     padding: "0 24px",
     marginTop: 56,
     [theme.breakpoints.up("md")]: {
