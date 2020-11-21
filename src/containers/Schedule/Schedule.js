@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   Grid,
   Button,
@@ -8,201 +8,17 @@ import {
   InputLabel,
   Typography,
   Slide,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  TextField,
 } from "@material-ui/core";
 import useStyles from "./Schedule.styles";
 import AddIcon from "@material-ui/icons/Add";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
-import TimeTable from "../../components/TimeTable/TimeTable";
-import TextField from "@material-ui/core/TextField";
-import Dialog from "@material-ui/core/Dialog";
-import DialogActions from "@material-ui/core/DialogActions";
-import DialogContent from "@material-ui/core/DialogContent";
-import DialogContentText from "@material-ui/core/DialogContentText";
-import DialogTitle from "@material-ui/core/DialogTitle";
-
-const useWindowResize = () => {
-  const [windowSize, setWindowSize] = useState("");
-  const [currentPos, setCurrentPos] = useState(0);
-
-  const debounce = (fn, ms) => {
-    let timer;
-    return () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        timer = null;
-        fn.apply(this);
-      }, ms);
-    };
-  };
-
-  useEffect(() => {
-    const captureWindowSize = () => {
-      if (window.innerWidth < 600 && windowSize !== "xs") {
-        setWindowSize("xs");
-        setCurrentPos(0);
-      }
-      if (
-        window.innerWidth >= 600 &&
-        window.innerWidth < 960 &&
-        windowSize !== "sm"
-      ) {
-        setWindowSize("sm");
-        setCurrentPos(0);
-      }
-      if (
-        window.innerWidth >= 960 &&
-        window.innerWidth < 1280 &&
-        windowSize !== "md"
-      ) {
-        setWindowSize("md");
-        setCurrentPos(0);
-      }
-      if (
-        window.innerWidth >= 1280 &&
-        window.innerWidth < 1920 &&
-        windowSize !== "lg"
-      ) {
-        setWindowSize("lg");
-        setCurrentPos(0);
-      }
-      if (window.innerWidth > 1920 && windowSize !== "xl") {
-        setWindowSize("xl");
-        setCurrentPos(0);
-      }
-    };
-    captureWindowSize();
-
-    const debounceHandleResize = debounce(() => {
-      captureWindowSize();
-    }, 500);
-
-    window.addEventListener("resize", debounceHandleResize);
-
-    return () => {
-      window.removeEventListener("resize", debounceHandleResize);
-    };
-  }, [windowSize]);
-
-  return [windowSize, currentPos, setCurrentPos];
-};
-
-const useSwipe = (windowSize, currentPos, setCurrentPos, labUsages, week) => {
-  const [isPrev, setIsPrev] = useState(true);
-  const [isNext, setIsNext] = useState(true);
-  const [displayedDays, setDisplayedDays] = useState([]);
-  const [displayedLabUsages, setDisplayedLabUsages] = useState([]);
-
-  useEffect(() => {
-    console.log(windowSize);
-    if (windowSize === "sm" || windowSize === "xs") {
-      const updatedDisplayedLabUsages = [];
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos && labUsage.week === week
-        )
-      );
-
-      setDisplayedLabUsages(updatedDisplayedLabUsages);
-
-      const updatedDisplayedDays = [];
-      updatedDisplayedDays.push(currentPos);
-
-      setDisplayedDays(updatedDisplayedDays);
-
-      setIsNext(currentPos < 5);
-    }
-    if (windowSize === "md") {
-      const updatedDisplayedLabUsages = [];
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos && labUsage.week === week
-        )
-      );
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos + 1 && labUsage.week === week
-        )
-      );
-
-      setDisplayedLabUsages(updatedDisplayedLabUsages);
-
-      const updatedDisplayedDays = [];
-      updatedDisplayedDays.push(currentPos);
-      updatedDisplayedDays.push(currentPos + 1);
-
-      setDisplayedDays(updatedDisplayedDays);
-
-      setIsNext(currentPos < 4);
-    }
-    if (windowSize === "lg" || windowSize === "xl") {
-      const updatedDisplayedLabUsages = [];
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos && labUsage.week === week
-        )
-      );
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos + 1 && labUsage.week === week
-        )
-      );
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos + 2 && labUsage.week === week
-        )
-      );
-      updatedDisplayedLabUsages.push(
-        labUsages.filter(
-          (labUsage) =>
-            labUsage.dayOfWeek === currentPos + 3 && labUsage.week === week
-        )
-      );
-
-      setDisplayedLabUsages(updatedDisplayedLabUsages);
-
-      const updatedDisplayedDays = [];
-      updatedDisplayedDays.push(currentPos);
-      updatedDisplayedDays.push(currentPos + 1);
-      updatedDisplayedDays.push(currentPos + 2);
-      updatedDisplayedDays.push(currentPos + 3);
-
-      setDisplayedDays(updatedDisplayedDays);
-
-      setIsNext(currentPos < 2);
-    }
-    setIsPrev(currentPos > 0);
-  }, [currentPos, windowSize, labUsages, week]);
-
-  const handleNext = () => {
-    if (windowSize === "lg" || windowSize === "md") {
-      setCurrentPos((prevPos) => (prevPos += 2));
-    } else {
-      setCurrentPos((prevPos) => (prevPos += 1));
-    }
-  };
-  const handlePrev = () => {
-    if (windowSize === "lg" || windowSize === "md") {
-      setCurrentPos((prevPos) => (prevPos -= 2));
-    } else {
-      setCurrentPos((prevPos) => (prevPos -= 1));
-    }
-  };
-
-  return [
-    handlePrev,
-    handleNext,
-    displayedLabUsages,
-    isNext,
-    isPrev,
-    displayedDays,
-  ];
-};
+import TimeTable from "./TimeTable/TimeTable";
 
 const useDialog = () => {
   const [isOpenDialog, setIsOpenDialog] = useState(false);
@@ -257,11 +73,11 @@ const Schedule = () => {
       endPeriod: 8,
       courseName: "New Technology",
       lecturerName: "Le Vinh Thinh",
-      week: 2,
+      week: 1,
     },
     {
       id: "1200",
-      lab: "A3-103",
+      lab: "A3-102",
       dayOfWeek: 0,
       startPeriod: 13,
       endPeriod: 15,
@@ -342,15 +158,6 @@ const Schedule = () => {
   ]);
 
   const [week, setWeek] = useState(1);
-  const [windowSize, currentPos, setCurrentPos] = useWindowResize();
-  const [
-    handlePrev,
-    handleNext,
-    displayedLabUsages,
-    isNext,
-    isPrev,
-    displayedDays,
-  ] = useSwipe(windowSize, currentPos, setCurrentPos, labUsages, week);
 
   const [isOpenDialog, setIsOpenDialog] = useDialog();
 
@@ -509,7 +316,7 @@ const Schedule = () => {
               // onChange={handleChange}
               label="Lab"
             >
-              <MenuItem value={'A3-102'}>A3-102</MenuItem>
+              <MenuItem value={"A3-102"}>A3-102</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
@@ -592,15 +399,7 @@ const Schedule = () => {
           <Typography>From Oct 1st, 2020 To Oct 6th, 2020</Typography>
         </Grid>
         <Grid item xs={12}>
-          <TimeTable
-            isPrev={isPrev}
-            isNext={isNext}
-            onPrev={handlePrev}
-            onNext={handleNext}
-            displayedDays={displayedDays}
-            displayedLabUsages={displayedLabUsages}
-            displayedLabs={labs}
-          />
+          <TimeTable labs={labs} labUsages={labUsages} />
         </Grid>
       </Grid>
     </div>
