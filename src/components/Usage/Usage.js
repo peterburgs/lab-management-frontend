@@ -8,11 +8,11 @@ const LabUsage = (props) => {
   const classes = useStyles({ index: props.index });
 
   return (
-    <Paper className={classes.usage} elevation={0}>
+    <Paper className={classes.usage} elevation={1}>
       <IconButton className={classes.editIcon}>
         <MoreVertIcon fontSize={"small"} />
       </IconButton>
-      <Typography style={{ fontSize: 13, fontWeight: 600 }}>
+      <Typography style={{ fontSize: 13, fontWeight: 600, marginRight: '1rem' }}>
         {props.courseName}
       </Typography>
       <Typography style={{ fontSize: 12 }}>{props.lecturerName}</Typography>

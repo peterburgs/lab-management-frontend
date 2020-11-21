@@ -14,8 +14,7 @@ export default makeStyles(() => ({
           : "#EEEAF7"
       }`,
     color: "#000",
-    width: "95%",
-    height: 166,
+    height: 140,
     borderLeft: (props) =>
       `${
         props.index % 3 === 1
@@ -24,16 +23,18 @@ export default makeStyles(() => ({
           ? "3px solid rgb(74,137,162)"
           : "3px solid rgb(101,55,192)"
       }`,
-    borderRadius: 0,
     paddingLeft: "0.2rem",
-    paddingTop: "0.9rem",
-    paddingBottom: "0.9rem",
+    paddingTop: "0.5rem",
+    paddingBottom: "0.5rem",
+    marginRight: "0.5rem",
     boxSizing: "border-box",
-    wordWrap: "break-word",
+    textAlign: "left",
+    position: "relative",
   },
   editIcon: {
     padding: 0,
     width: 10,
-    justifySelf: 'end',
+    left: 115,
+    position: "absolute",
   },
 }));

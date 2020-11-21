@@ -54,6 +54,7 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string,
   order: PropTypes.string,
   onCreateSortHandler: PropTypes.func,
+  center: PropTypes.bool,
 };
 
 export default EnhancedTableHead;
