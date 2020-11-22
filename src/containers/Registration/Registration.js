@@ -4,7 +4,7 @@ import useStyles from "./Registration.styles";
 import EditIcon from "@material-ui/icons/Edit";
 import RegistrationTable from "./RegistrationTable/RegistrationTable";
 import produce from "immer";
-import RegistrationDialog from "./RegistrationDialog/RegistrationDialog";
+import OpenRegistrationForm from "./OpenRegistrationForm/OpenRegistrationForm";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
 const Registration = () => {
@@ -22,7 +22,7 @@ const Registration = () => {
   const [remainingTime, setRemainingTime] = useState("");
 
   const [isOpenConfirmDialog, setIsOpenConfirmDialog] = useState(false);
-  const [isOpenRegistrationDialog, setIsOpenRegistrationDialog] = useState(
+  const [openRegistrationFormOpened, setOpenRegistrationFormOpened] = useState(
     false
   );
 
@@ -169,15 +169,15 @@ const Registration = () => {
   };
 
   const handleOpenRegistration = () => {
-    setIsOpenRegistrationDialog(true);
+    setOpenRegistrationFormOpened(true);
   };
 
   const handleSubmitOpenRegistration = () => {
-    setIsOpenRegistrationDialog(false);
+    setOpenRegistrationFormOpened(false);
   };
 
   const handleCancelOpenRegistration = () => {
-    setIsOpenRegistrationDialog(false);
+    setOpenRegistrationFormOpened(false);
   };
 
   const renderRegistrationToolbar = (latestRegistration) => {
@@ -225,8 +225,8 @@ const Registration = () => {
 
   return (
     <div className={classes.registration}>
-      <RegistrationDialog
-        isOpen={isOpenRegistrationDialog}
+      <OpenRegistrationForm
+        isOpen={openRegistrationFormOpened}
         onCancel={handleCancelOpenRegistration}
         onSubmit={handleSubmitOpenRegistration}
       />

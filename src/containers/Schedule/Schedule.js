@@ -12,12 +12,12 @@ import useStyles from "./Schedule.styles";
 import AddIcon from "@material-ui/icons/Add";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "./TimeTable/TimeTable";
-import LabUsageDialog from "./LabUsageDialog/LabUsageDialog";
+import LabUsageForm from "./LabUsageForm/LabUsageForm";
 
 const Schedule = () => {
   const classes = useStyles();
   const [week, setWeek] = useState(1);
-  const [isOpenLabUsageDialog, setIsOpenLabUsageDialog] = useState(false);
+  const [labUsageFormOpened, setLabUsageFormOpened] = useState(false);
   const [labs] = useState([
     {
       id: 1,
@@ -144,21 +144,21 @@ const Schedule = () => {
   ]);
 
   const handleAddLabUsage = () => {
-    setIsOpenLabUsageDialog(true);
+    setLabUsageFormOpened(true);
   };
 
   const handleSubmitAddLabUsage = () => {
-    setIsOpenLabUsageDialog(false);
+    setLabUsageFormOpened(false);
   };
 
   const handleCancelAddLabUsage = () => {
-    setIsOpenLabUsageDialog(false);
+    setLabUsageFormOpened(false);
   };
 
   return (
     <div className={classes.schedule}>
-      <LabUsageDialog
-        isOpen={isOpenLabUsageDialog}
+      <LabUsageForm
+        isOpen={labUsageFormOpened}
         onCancel={handleCancelAddLabUsage}
         onSubmit={handleSubmitAddLabUsage}
       />

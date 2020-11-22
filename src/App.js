@@ -11,6 +11,7 @@ import "fontsource-roboto";
 
 import Schedule from "./containers/Schedule/Schedule";
 import Registration from "./containers/Registration/Registration";
+import Course from "./containers/Course/Course";
 
 const theme = createMuiTheme({
   palette: {
@@ -39,6 +40,11 @@ function App() {
       <Route path="/registration">
         <Layout registrationPage>
           <Registration />
+        </Layout>
+      </Route>
+      <Route path="/courses">
+        <Layout>
+          <Course />
         </Layout>
       </Route>
     </Switch>

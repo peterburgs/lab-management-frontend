@@ -21,7 +21,7 @@ import {
   CardActions,
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
-import useStyles from "./RegistrationDialog.styles";
+import useStyles from "./OpenRegistrationForm.styles";
 import PropTypes from "prop-types";
 import produce from "immer";
 
@@ -29,7 +29,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const RegistrationForm = (props) => {
+const OpenRegistrationForm = (props) => {
   const classes = useStyles();
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
@@ -195,10 +195,10 @@ const RegistrationForm = (props) => {
   );
 };
 
-RegistrationForm.propTypes = {
+OpenRegistrationForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
 };
 
-export default RegistrationForm;
+export default OpenRegistrationForm;
