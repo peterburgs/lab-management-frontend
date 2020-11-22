@@ -19,6 +19,7 @@ export default makeStyles((theme) => ({
         easing: theme.transitions.easing.sharp,
         duration: theme.transitions.duration.enteringScreen,
       }),
+      overflowX: "hidden",
     },
   },
   drawerClose: {

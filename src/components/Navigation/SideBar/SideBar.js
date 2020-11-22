@@ -158,7 +158,7 @@ const SideBar = (props) => {
           }
           link="/logs"
         >
-          Logs
+          System logs
         </NavigationItem>
       </div>
     </React.Fragment>
