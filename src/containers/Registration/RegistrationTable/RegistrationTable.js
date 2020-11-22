@@ -15,6 +15,7 @@ import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../components/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
+import SimpleBar from "simplebar-react";
 
 const StyledTableRow = withStyles((theme) => ({
   root: {
@@ -106,46 +107,48 @@ const RegistrationTable = (props) => {
     <div className={classes.registrationTable}>
       <Paper className={classes.paper}>
         <EnhancedToolbar title={"Registration"} registrationTable />
-        <TableContainer style={{ maxHeight: 300 }}>
-          <Table stickyHeader className={classes.table}>
-            <EnhancedTableHead
-              order={order}
-              orderBy={orderBy}
-              onCreateSortHandler={createSortHandler}
-              headCells={headCells}
-              isAllowSort={true}
-            />
-            <TableBody>
-              {stableSort(props.teachings, getComparator(order, orderBy))
-                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                .map((row) => (
-                  <StyledTableRow key={row.lecturerId}>
-                    <TableCell size="small" component="th" scope="row">
-                      {row.lecturerId}
-                    </TableCell>
-                    <TableCell size="small" align="right">
-                      {row.fullName}
-                    </TableCell>
-                    <TableCell size="small" align="right">
-                      {row.courseName}
-                    </TableCell>
-                    <TableCell size="small" align="right">
-                      {row.group}
-                    </TableCell>
-                    <TableCell size="small" align="right">
-                      <IconButton>
-                        <MoreVertIcon fontSize={"small"} />
-                      </IconButton>
-                    </TableCell>
-                  </StyledTableRow>
-                ))}
-              {emptyRows > 0 && (
-                <TableRow style={{ height: 53 * emptyRows }}>
-                  <TableCell colSpan={5} />
-                </TableRow>
-              )}
-            </TableBody>
-          </Table>
+        <TableContainer>
+          <SimpleBar style={{ maxHeight: 300 }}>
+            <Table style={{ minWidth: 700 }} stickyHeader>
+              <EnhancedTableHead
+                order={order}
+                orderBy={orderBy}
+                onCreateSortHandler={createSortHandler}
+                headCells={headCells}
+                isAllowSort={true}
+              />
+              <TableBody>
+                {stableSort(props.teachings, getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .map((row) => (
+                    <StyledTableRow key={row.lecturerId}>
+                      <TableCell size="small" component="th" scope="row">
+                        {row.lecturerId}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        {row.fullName}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        {row.courseName}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        {row.group}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        <IconButton>
+                          <MoreVertIcon fontSize={"small"} />
+                        </IconButton>
+                      </TableCell>
+                    </StyledTableRow>
+                  ))}
+                {emptyRows > 0 && (
+                  <TableRow style={{ height: 53 * emptyRows }}>
+                    <TableCell colSpan={5} />
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </SimpleBar>
         </TableContainer>
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}

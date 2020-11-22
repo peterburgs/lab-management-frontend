@@ -6,6 +6,8 @@ import {
   Badge,
   IconButton,
   Typography,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
 import useStyles from "./Layout.styles";
 import MenuIcon from "@material-ui/icons/Menu";
@@ -19,6 +21,8 @@ import PropTypes from "prop-types";
 const Layout = (props) => {
   const [sideBarOpened, setSideBarOpened] = useState(true);
   const [sideBarMobileOpened, setSideBarMobileOpened] = useState(false);
+  const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
+  const open = Boolean(accountMenuAnchorEl);
 
   const classes = useStyles();
 
@@ -36,6 +40,14 @@ const Layout = (props) => {
     } else {
       setSideBarMobileOpened(true);
     }
+  };
+
+  const handleAccountMenu = (event) => {
+    setAccountMenuAnchorEl(event.currentTarget);
+  };
+
+  const handleAccountMenuClose = () => {
+    setAccountMenuAnchorEl(null);
   };
 
   return (
@@ -84,14 +96,32 @@ const Layout = (props) => {
                 aria-label="account of current user"
                 aria-haspopup="true"
                 color="inherit"
+                onClick={handleAccountMenu}
               >
                 <AccountCircle />
               </IconButton>
+              <Menu
+                id="menu-appbar"
+                anchorEl={accountMenuAnchorEl}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={open}
+                onClose={handleAccountMenuClose}
+              >
+                <MenuItem onClick={handleAccountMenuClose}>Log out</MenuItem>
+              </Menu>
             </div>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
-      <main className={classes.content}>{props.children}</main>
+        <main className={classes.content}>{props.children}</main>
     </React.Fragment>
   );
 };

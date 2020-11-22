@@ -1,14 +1,10 @@
 * {
-  -ms-overflow-style: none;
   box-sizing: border-box;
-}
-::-webkit-scrollbar {
-  display: none;
 }
 body {
   margin: 0;
   padding: 0;
-  background-color: #F0F2F5;
+  background-color: #f0f2f5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

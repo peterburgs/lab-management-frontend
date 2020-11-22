@@ -27,9 +27,13 @@ export default makeStyles((theme) => ({
     borderRadius: 8,
     display: 'flex',
     justifyContent: 'center',
+    alignItems: 'center',
   },
   button: {
     borderRadius: 8,
     textTransform: "none",
   },
+  dialog: {
+    borderRadius: 16,
+  }
 }));

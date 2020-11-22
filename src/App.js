@@ -1,17 +1,16 @@
 /* eslint-disable react/prop-types */
-import React, { Suspense } from "react";
+import React from "react";
 import Layout from "./hoc/Layout";
 import useStyles from "./App.styles";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core";
 import { Switch, Route } from "react-router-dom";
-import { CircularProgress } from "@material-ui/core";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import MomentUtils from "@date-io/moment";
 
 import "fontsource-roboto";
 
-const Schedule = React.lazy(() => import("./containers/Schedule/Schedule"));
-const Registration = React.lazy(() =>
-  import("./containers/Registration/Registration")
-);
+import Schedule from "./containers/Schedule/Schedule";
+import Registration from "./containers/Registration/Registration";
 
 const theme = createMuiTheme({
   palette: {
@@ -34,23 +33,21 @@ function App() {
     <Switch>
       <Route path="/schedule">
         <Layout>
-          <Suspense fallback={<CircularProgress />}>
-            <Schedule />
-          </Suspense>
+          <Schedule />
         </Layout>
       </Route>
       <Route path="/registration">
         <Layout registrationPage>
-          <Suspense fallback={<CircularProgress />}>
-            <Registration />
-          </Suspense>
+          <Registration />
         </Layout>
       </Route>
     </Switch>
   );
   return (
     <ThemeProvider theme={theme}>
-      <div className={classes.app}>{routes}</div>
+      <MuiPickersUtilsProvider utils={MomentUtils}>
+        <div className={classes.app}>{routes}</div>
+      </MuiPickersUtilsProvider>
     </ThemeProvider>
   );
 }

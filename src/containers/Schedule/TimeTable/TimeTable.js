@@ -7,14 +7,17 @@ import {
   TableCell,
   TableHead,
   Grid,
+  Toolbar,
+  Typography,
 } from "@material-ui/core";
-import React, { useRef } from "react";
+import React, { useRef, useEffect } from "react";
 import useStyles from "./TimeTable.styles";
 import Lab from "../../../components/Lab/Lab";
-import EnhancedToolbar from "../../../components/EnhancedTableToolbar/EnhancedTableToolbar";
 import Usage from "../../../components/Usage/Usage";
 import PropTypes from "prop-types";
 import _ from "lodash";
+import SimpleBar from "simplebar-react";
+import "simplebar/dist/simplebar.min.css";
 
 const TimeTable = (props) => {
   const classes = useStyles();
@@ -88,12 +91,10 @@ const TimeTable = (props) => {
 
   const renderLabUsages = (labUsages, labs) => {
     labs = _.cloneDeep(labs).sort();
-    console.log(labUsages);
     return labs.map((lab) => {
       return (
         <TableRow key={lab.id}>
           {[...Array(6)].map((_, index) => {
-            console.log(index);
             return (
               <TableCell
                 align={"center"}
@@ -101,6 +102,7 @@ const TimeTable = (props) => {
                 size="small"
                 padding={"default"}
                 key={lab.id + index}
+                // Important code
                 style={{ minWidth: 420 }}
               >
                 <Grid container spacing={0}>
@@ -182,21 +184,29 @@ const TimeTable = (props) => {
     });
   };
 
-  const dayTableRef = useRef();
   const labTableRef = useRef();
+  const scrollableNodeRef = useRef();
 
-  const handleOnScroll = () => {
-    labTableRef.current.scrollTop = dayTableRef.current.scrollTop;
+  const handleOnScroll = (e) => {
+    labTableRef.current.scrollTop = e.target.scrollTop;
   };
+
+  useEffect(() => {
+    scrollableNodeRef.current.addEventListener("scroll", handleOnScroll);
+  }, []);
 
   return (
     <Paper className={classes.timeTable}>
-      <EnhancedToolbar title={"Schedule"} />
-      <Paper
-        style={{ maxHeight: 540, position: "relative" }}
-        className={classes.paper}
-      >
-        <TableContainer ref={labTableRef} className={classes.labTable}>
+      <Toolbar className={classes.toolBar}>
+        <Typography variant="h6" component="div">
+          Schedule
+        </Typography>
+      </Toolbar>
+      <Paper className={classes.paper}>
+        <TableContainer
+          style={{ width: 100, maxHeight: 540, overflowY: "hidden" }}
+          ref={labTableRef}
+        >
           <Table stickyHeader>
             <TableHead>
               <TableRow>
@@ -210,31 +220,31 @@ const TimeTable = (props) => {
             <TableBody>{renderLabs(props.labs)}</TableBody>
           </Table>
         </TableContainer>
-
-        <TableContainer
-          ref={dayTableRef}
-          onScroll={handleOnScroll}
-          component="div"
-        >
-          <Table stickyHeader className={classes.dayTable}>
-            <TableHead>
-              <TableRow>
-                {dayHeadCells.map((headCell) => (
-                  <TableCell
-                    size="small"
-                    key={headCell.id}
-                    align={"center"}
-                    style={{ borderLeft: "1px solid rgba(0,0,0,0.1)" }}
-                  >
-                    {headCell.label}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {renderLabUsages(props.labUsages, props.labs)}
-            </TableBody>
-          </Table>
+        <TableContainer>
+          <SimpleBar
+            scrollableNodeProps={{ ref: scrollableNodeRef }}
+            style={{ maxHeight: 540 }}
+          >
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  {dayHeadCells.map((headCell) => (
+                    <TableCell
+                      size="small"
+                      key={headCell.id}
+                      align={"center"}
+                      style={{ borderLeft: "1px solid rgba(0,0,0,0.1)" }}
+                    >
+                      {headCell.label}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {renderLabUsages(props.labUsages, props.labs)}
+              </TableBody>
+            </Table>
+          </SimpleBar>
         </TableContainer>
       </Paper>
     </Paper>
