@@ -14,7 +14,7 @@ import {
   Button,
   Slide,
 } from "@material-ui/core";
-import useStyles from "./LabUsageDialog.styles";
+import useStyles from "./LabUsageForm.styles";
 import PropTypes from "prop-types";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
