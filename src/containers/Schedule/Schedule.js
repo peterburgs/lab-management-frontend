@@ -12,12 +12,12 @@ import useStyles from "./Schedule.styles";
 import AddIcon from "@material-ui/icons/Add";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "./TimeTable/TimeTable";
-import LabUsageForm from "./LabUsageForm/LabUsageForm";
+import LabUsageDialog from "./LabUsageDialog/LabUsageDialog";
 
 const Schedule = () => {
   const classes = useStyles();
   const [week, setWeek] = useState(1);
-  const [labUsageFormOpened, setLabUsageFormOpened] = useState(false);
+  const [openedLabUsageDialog, setOpenedLabUsageDialog] = useState(false);
   const [labs] = useState([
     {
       id: 1,
@@ -143,92 +143,102 @@ const Schedule = () => {
     },
   ]);
 
-  const handleAddLabUsage = () => {
-    setLabUsageFormOpened(true);
+  const handleAddLabUsageButtonClick = () => {
+    setOpenedLabUsageDialog(true);
   };
 
-  const handleSubmitAddLabUsage = () => {
-    setLabUsageFormOpened(false);
+  const handleLabUsageDialogSubmitButtonClick = () => {
+    setOpenedLabUsageDialog(false);
   };
 
-  const handleCancelAddLabUsage = () => {
-    setLabUsageFormOpened(false);
+  const handleLabUsageDialogCancelButtonClick = () => {
+    setOpenedLabUsageDialog(false);
   };
 
   return (
     <div className={classes.schedule}>
-      <LabUsageForm
-        isOpen={labUsageFormOpened}
-        onCancel={handleCancelAddLabUsage}
-        onSubmit={handleSubmitAddLabUsage}
+      <LabUsageDialog
+        isOpen={openedLabUsageDialog}
+        onCancel={handleLabUsageDialogCancelButtonClick}
+        onSubmit={handleLabUsageDialogSubmitButtonClick}
       />
-      <Grid container spacing={0}>
-        <Grid className={classes.toolbarLeft} item container spacing={1} lg={7}>
-          <Grid item xs={12} sm={"auto"}>
-            <Button
-              className={classes.button}
-              variant="contained"
-              color="primary"
-              startIcon={<AddIcon />}
-              onClick={handleAddLabUsage}
+      <Grid justify="center" container spacing={0}>
+        <Grid item container xs={11}>
+            <Grid
+              className={classes.toolbarLeft}
+              spacing={1}
+              item
+              container
+              lg={7}
             >
-              Add lab usage
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={"auto"}>
-            <Button
-              className={classes.button}
-              variant="contained"
-              style={{ backgroundColor: "#388E3C", color: "#fff" }}
-              startIcon={<ImportExportIcon />}
-            >
-              Export lab usage
-            </Button>
-          </Grid>
-          <Grid item xs={12} sm={"auto"}>
-            <Button
-              className={classes.button}
-              variant="contained"
-              style={{ backgroundColor: "#388E3C", color: "#fff" }}
-              startIcon={<ImportExportIcon />}
-            >
-              Export theory room usage
-            </Button>
-          </Grid>
+              <Grid item xs={12} sm={"auto"}>
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddLabUsageButtonClick}
+                >
+                  Add lab usage
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={"auto"}>
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  style={{ backgroundColor: "#388E3C", color: "#fff" }}
+                  startIcon={<ImportExportIcon />}
+                >
+                  Export lab usage
+                </Button>
+              </Grid>
+              <Grid item xs={12} sm={"auto"}>
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  style={{ backgroundColor: "#388E3C", color: "#fff" }}
+                  startIcon={<ImportExportIcon />}
+                >
+                  Export theory room usage
+                </Button>
+              </Grid>
+            </Grid>
+            <Grid className={classes.toolbarRight} item lg={5}>
+              <FormControl>
+                <InputLabel style={{ color: "white" }} id="demo-simple-select-outlined-label">
+                  Week
+                </InputLabel>
+                <Select style={{ color: "white" }}
+                  labelId="demo-simple-select-outlined-label"
+                  id="demo-simple-select-outlined"
+                  value={week}
+                  onChange={(e) => setWeek(e.target.value)}
+                  label="Week"
+                >
+                  <MenuItem value={1}>1</MenuItem>
+                  <MenuItem value={2}>2</MenuItem>
+                  <MenuItem value={3}>3</MenuItem>
+                  <MenuItem value={4}>4</MenuItem>
+                  <MenuItem value={5}>5</MenuItem>
+                  <MenuItem value={6}>6</MenuItem>
+                  <MenuItem value={7}>7</MenuItem>
+                  <MenuItem value={8}>8</MenuItem>
+                  <MenuItem value={9}>9</MenuItem>
+                  <MenuItem value={10}>10</MenuItem>
+                  <MenuItem value={11}>11</MenuItem>
+                  <MenuItem value={12}>12</MenuItem>
+                  <MenuItem value={13}>13</MenuItem>
+                  <MenuItem value={14}>14</MenuItem>
+                  <MenuItem value={15}>15</MenuItem>
+                </Select>
+              </FormControl>
+              <Typography style={{ color: "white" }}>From</Typography>
+              <Typography style={{ color: "white" }}>Oct 1st, 2020</Typography>
+              <Typography style={{ color: "white" }}>to</Typography>
+              <Typography style={{ color: "white" }}>Oct 2nd, 2020</Typography>
+            </Grid>
         </Grid>
-        <Grid className={classes.toolbarRight} item lg={5}>
-          <FormControl className={classes.formControl}>
-            <InputLabel id="demo-simple-select-outlined-label">Week</InputLabel>
-            <Select
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-outlined"
-              value={week}
-              onChange={(e) => setWeek(e.target.value)}
-              label="Week"
-            >
-              <MenuItem value={1}>1</MenuItem>
-              <MenuItem value={2}>2</MenuItem>
-              <MenuItem value={3}>3</MenuItem>
-              <MenuItem value={4}>4</MenuItem>
-              <MenuItem value={5}>5</MenuItem>
-              <MenuItem value={6}>6</MenuItem>
-              <MenuItem value={7}>7</MenuItem>
-              <MenuItem value={8}>8</MenuItem>
-              <MenuItem value={9}>9</MenuItem>
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={11}>11</MenuItem>
-              <MenuItem value={12}>12</MenuItem>
-              <MenuItem value={13}>13</MenuItem>
-              <MenuItem value={14}>14</MenuItem>
-              <MenuItem value={15}>15</MenuItem>
-            </Select>
-          </FormControl>
-          <Typography>From</Typography>
-          <Typography color="secondary">Oct 1st, 2020</Typography>
-          <Typography>to</Typography>
-          <Typography color="secondary">Oct 2nd, 2020</Typography>
-        </Grid>
-        <Grid item xs={12}>
+        <Grid item xs={11}>
           <TimeTable labs={labs} labUsages={labUsages} />
         </Grid>
       </Grid>

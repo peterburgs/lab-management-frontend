@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles({
+export default makeStyles(() => ({
   lecturerTable: {
     width: "100%",
   },
@@ -9,4 +9,15 @@ export default makeStyles({
     borderRadius: 8,
     marginBottom: 24,
   },
-});
+  button: {
+    borderRadius: 8,
+    textTransform: "none",
+    minWidth: 150,
+    marginLeft: "0.5rem",
+  },
+  row: {
+    '& td': {
+      fontSize: 13,
+    }
+  }
+}));

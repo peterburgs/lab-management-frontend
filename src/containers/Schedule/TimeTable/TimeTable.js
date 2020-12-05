@@ -204,7 +204,7 @@ const TimeTable = (props) => {
       </Toolbar>
       <Paper className={classes.paper}>
         <TableContainer
-          style={{ width: 100, maxHeight: 540, overflowY: "hidden" }}
+          style={{ width: 100, maxHeight: 520, overflowY: "hidden" }}
           ref={labTableRef}
         >
           <Table stickyHeader>
@@ -223,7 +223,7 @@ const TimeTable = (props) => {
         <TableContainer>
           <SimpleBar
             scrollableNodeProps={{ ref: scrollableNodeRef }}
-            style={{ maxHeight: 540 }}
+            style={{ maxHeight: 520 }}
           >
             <Table stickyHeader>
               <TableHead>
