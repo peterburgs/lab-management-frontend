@@ -1,73 +1,73 @@
 import React, { useState } from "react";
 import { Route, useHistory, useRouteMatch } from "react-router-dom";
-import useStyles from "./Course.styles";
+import useStyles from "./Laboratory.styles";
 import { Grid, Paper, IconButton, InputBase } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import CourseTable from "./CourseTable/CourseTable";
-import CourseDialog from "./CourseDialog/CourseDialog";
+import LaboratoryTable from "./LaboratoryTable/LaboratoryTable";
+import LaboratoryDialog from "./LaboratoryDialog/LaboratoryDialog";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
-const Course = () => {
+const Laboratory = () => {
   const classes = useStyles();
-  const [openedCourseDialog, setOpenedCourseDialog] = useState(false);
+  const [openedLaboratoryDialog, setOpenedLaboratoryDialog] = useState(false);
   const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
   const history = useHistory();
   const match = useRouteMatch();
 
-  const [courses] = useState([
+  const [labs] = useState([
     {
       id: 123,
-      name: "Intro to programming",
-      credit: 3,
+      name: "A3-101",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 124,
-      name: "Intro to IT",
-      credit: 3,
+      name: "A3-102",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 125,
-      name: "Database System",
-      credit: 3,
+      name: "A3-103",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 126,
-      name: "Database Management System",
-      credit: 3,
+      name: "A3-104",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 127,
-      name: "Programming Technique",
-      credit: 3,
+      name: "A3-105",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 128,
-      name: "Networking Essentials",
-      credit: 3,
+      name: "A3-106",
+      capacity: 30,
       createdAt: "11/12/2020 7:00 AM",
     },
   ]);
 
-  // handle "New course" button click
-  const handleNewCourseButtonClick = () => {
-    setOpenedCourseDialog(true);
+  // handle "New laboratory" button click
+  const handleNewLaboratoryButtonClick = () => {
+    setOpenedLaboratoryDialog(true);
   };
 
-  // handle submit button click in course dialog
-  const handleCourseDialogSubmitButtonClick = () => {
-    setOpenedCourseDialog(false);
+  // handle submit button click in Laboratory dialog
+  const handleLaboratoryDialogSubmitButtonClick = () => {
+    setOpenedLaboratoryDialog(false);
   };
 
-  // handle cancel button click in course dialog
-  const handleCourseDialogCancelButtonClick = () => {
-    history.replace("/courses");
-    if (openedCourseDialog) {
-      setOpenedCourseDialog(false);
+  // handle cancel button click in Laboratory dialog
+  const handleLaboratoryDialogCancelButtonClick = () => {
+    history.replace("/laboratories");
+    if (openedLaboratoryDialog) {
+      setOpenedLaboratoryDialog(false);
     }
   };
 
@@ -76,7 +76,7 @@ const Course = () => {
   };
 
   const handleEditClick = () => {
-    history.replace("/courses/id");
+    history.replace("/laboratories/id");
   };
 
   // handle submit button click in confirm dialog
@@ -90,24 +90,24 @@ const Course = () => {
   };
 
   return (
-    <div className={classes.course}>
+    <div className={classes.lab}>
       <Route path={match.path + "/id"}>
-        <CourseDialog
+        <LaboratoryDialog
           isOpen={true}
-          onCancel={handleCourseDialogCancelButtonClick}
-          onSubmit={handleCourseDialogSubmitButtonClick}
+          onCancel={handleLaboratoryDialogCancelButtonClick}
+          onSubmit={handleLaboratoryDialogSubmitButtonClick}
         />
       </Route>
-      <CourseDialog
-        isOpen={openedCourseDialog}
-        onCancel={handleCourseDialogCancelButtonClick}
-        onSubmit={handleCourseDialogSubmitButtonClick}
+      <LaboratoryDialog
+        isOpen={openedLaboratoryDialog}
+        onCancel={handleLaboratoryDialogCancelButtonClick}
+        onSubmit={handleLaboratoryDialogSubmitButtonClick}
       />
       <ConfirmDialog
         isOpen={openedConfirmDialog}
         onCancel={handleConfirmDialogCancelButtonClick}
         onSubmit={handleConfirmDialogSubmitButtonClick}
-        title="Do you want to delete the course?"
+        title="Do you want to delete the lab?"
       />
       <Grid container justify="center">
         <Grid item xs={11}>
@@ -121,17 +121,17 @@ const Course = () => {
             </IconButton>
             <InputBase
               className={classes.input}
-              placeholder="Enter course ID or course name"
-              inputProps={{ "aria-label": "enter course id or course name" }}
+              placeholder="Enter lab name"
+              inputProps={{ "aria-label": "enter lab name" }}
             />
           </Paper>
         </Grid>
         <Grid style={{ marginTop: 24 }} item xs={11}>
-          <CourseTable
+          <LaboratoryTable
             onDeleteClick={handleDeleteClick}
             onEditClick={handleEditClick}
-            onAddCourse={handleNewCourseButtonClick}
-            courses={courses}
+            onAddLab={handleNewLaboratoryButtonClick}
+            labs={labs}
           />
         </Grid>
       </Grid>
@@ -139,4 +139,4 @@ const Course = () => {
   );
 };
 
-export default Course;
+export default Laboratory;

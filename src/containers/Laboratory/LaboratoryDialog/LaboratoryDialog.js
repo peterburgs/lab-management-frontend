@@ -8,14 +8,14 @@ import {
   Button,
   Slide,
 } from "@material-ui/core";
-import useStyles from "./CourseForm.styles";
+import useStyles from "./LaboratoryDialog.styles";
 import PropTypes from "prop-types";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const CourseForm = (props) => {
+const LaboratoryDialog = (props) => {
   const classes = useStyles();
 
   return (
@@ -26,23 +26,19 @@ const CourseForm = (props) => {
       onClose={props.onCancel}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add a course</DialogTitle>
+      <DialogTitle id="form-dialog-title">
+        {props.isEdit ? "Edit laboratory" : "Add a laboratory"}
+      </DialogTitle>
       <DialogContent>
         <TextField
           required
-          label="Course ID"
+          label="Lab name"
           variant="outlined"
           className={classes.formElement}
         />
         <TextField
           required
-          label="Course name"
-          variant="outlined"
-          className={classes.formElement}
-        />
-        <TextField
-          required
-          label="Credit"
+          label="Capacity"
           variant="outlined"
           className={classes.formElement}
         />
@@ -65,10 +61,11 @@ const CourseForm = (props) => {
   );
 };
 
-CourseForm.propTypes = {
+LaboratoryDialog.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
+  isEdit: PropTypes.bool.isRequired,
 };
 
-export default CourseForm;
+export default LaboratoryDialog;

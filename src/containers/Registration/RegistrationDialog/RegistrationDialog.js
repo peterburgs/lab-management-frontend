@@ -15,13 +15,9 @@ import {
   Grid,
   IconButton,
   Chip,
-  Card,
-  CardActionArea,
-  CardContent,
-  CardActions,
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
-import useStyles from "./OpenRegistrationForm.styles";
+import useStyles from "./RegistrationDialog.styles";
 import PropTypes from "prop-types";
 import produce from "immer";
 
@@ -29,27 +25,28 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const OpenRegistrationForm = (props) => {
+const RegistrationDialog = (props) => {
   const classes = useStyles();
+
+  // Form state
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [allCourses, setAllCourses] = useState(true);
-  const [addedCourses, setAddedCourses] = useState([]);
+  const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(true);
+  const [appliedCourses, setAppliedCourses] = useState([]);
   const [courseToAdd, setCourseToAdd] = useState("");
 
-  const handleCheckAllCourses = (e) => {
-    setAllCourses(e.target.checked);
+  const handleApplyToAllCourses = (e) => {
+    setIsAllCoursesApplied(e.target.checked);
   };
 
-  const handleDelete = (course) => {
-    console.log(course);
-    setAddedCourses((addedCourse) => {
+  const handleDeleteCourse = (course) => {
+    setAppliedCourses((addedCourse) => {
       return addedCourse.filter((c) => c !== course);
     });
   };
 
   const handleAddCourse = () => {
-    setAddedCourses(
+    setAppliedCourses(
       produce((draft) => {
         draft.push(courseToAdd);
       })
@@ -74,6 +71,7 @@ const OpenRegistrationForm = (props) => {
           format="DD/MM/yyyy HH:mm"
           disablePast
           className={classes.formElement}
+          required
         />
         <DateTimePicker
           label="End date"
@@ -83,6 +81,7 @@ const OpenRegistrationForm = (props) => {
           format="DD/MM/yyyy HH:mm"
           disablePast
           className={classes.formElement}
+          required
         />
         <DialogContentText style={{ marginBottom: 0 }}>
           Apply to course
@@ -91,8 +90,8 @@ const OpenRegistrationForm = (props) => {
           <FormControlLabel
             control={
               <Checkbox
-                checked={allCourses}
-                onChange={handleCheckAllCourses}
+                checked={isAllCoursesApplied}
+                onChange={handleApplyToAllCourses}
                 name="allCourses"
               />
             }
@@ -105,7 +104,7 @@ const OpenRegistrationForm = (props) => {
         >
           * Every course can register to this registration
         </Typography>
-        {!allCourses ? (
+        {!isAllCoursesApplied ? (
           <React.Fragment>
             <Grid container spacing={1}>
               <Grid item xs={11}>
@@ -129,12 +128,12 @@ const OpenRegistrationForm = (props) => {
                 </IconButton>
               </Grid>
             </Grid>
-            <div className={classes.addedCourses}>
-              {addedCourses.map((course) => (
+            <div className={classes.appliedCourses}>
+              {appliedCourses.map((course) => (
                 <Chip
                   key={course}
                   label={course}
-                  onDelete={() => handleDelete(course)}
+                  onDelete={() => handleDeleteCourse(course)}
                   color="primary"
                   style={{ marginRight: "0.5rem", marginTop: "0.5rem" }}
                 />
@@ -142,40 +141,6 @@ const OpenRegistrationForm = (props) => {
             </div>
           </React.Fragment>
         ) : null}
-        <DialogContentText>Policies</DialogContentText>
-        <Button
-          variant="outlined"
-          disableElevation
-          style={{
-            borderRadius: 8,
-            marginBottom: "1rem",
-            color: "#388E3C",
-            border: "1px solid #388E3C",
-          }}
-          color="primary"
-        >
-          Add policies
-        </Button>
-        <Card elevation={3} className={classes.card}>
-          <CardActionArea>
-            <CardContent>
-              <Typography gutterBottom variant="h5" component="h2">
-                Networking Essentials
-              </Typography>
-              <Typography variant="body2" color="textSecondary" component="p">
-                Software required: VMware
-              </Typography>
-            </CardContent>
-          </CardActionArea>
-          <CardActions>
-            <Button size="small" color="primary">
-              Edit
-            </Button>
-            <Button size="small" color="primary">
-              Delete
-            </Button>
-          </CardActions>
-        </Card>
       </DialogContent>
       <DialogActions style={{ padding: "16px 24px" }}>
         <Button onClick={props.onCancel} color="primary">
@@ -195,10 +160,10 @@ const OpenRegistrationForm = (props) => {
   );
 };
 
-OpenRegistrationForm.propTypes = {
+RegistrationDialog.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
 };
 
-export default OpenRegistrationForm;
+export default RegistrationDialog;

@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   requestPending: {
     borderRadius: 8,
     padding: "0.5rem",
@@ -23,15 +23,6 @@ export default makeStyles((theme) => ({
     "& p": {
       color: "white",
       fontSize: 12,
-    },
-    [theme.breakpoints.down("sm")]: {
-      background: "#F0F2F5",
-      "& svg": {
-        color: "#1976D2",
-      },
-      "& p": {
-        color: "#1976D2",
-      },
     },
   },
 }));

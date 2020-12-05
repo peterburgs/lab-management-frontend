@@ -9,7 +9,7 @@ export default makeStyles({
     borderRadius: 8,
     minWidth: 500,
   },
-  addedCourses: {
+  appliedCourses: {
     display: 'flex',
     flexDirection: 'row',
     marginBottom: '1rem',

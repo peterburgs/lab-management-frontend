@@ -13,7 +13,7 @@ import {
   MenuItem,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import useStyles from "./CourseTable.styles";
+import useStyles from "./LaboratoryTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
@@ -30,7 +30,7 @@ const StyledTableRow = withStyles(() => ({
   },
 }))(TableRow);
 
-const CourseTable = (props) => {
+const LaboratoryTable = (props) => {
   const classes = useStyles();
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
@@ -46,17 +46,13 @@ const CourseTable = (props) => {
       label: "#",
     },
     {
-      id: "id",
-      label: "ID",
-    },
-    {
       id: "name",
-      label: "Name",
+      label: "name",
     },
     {
-      id: "credit",
+      id: "capacity",
       isNumber: true,
-      label: "Credit",
+      label: "Capacity",
     },
     {
       id: "createdAt",
@@ -111,7 +107,7 @@ const CourseTable = (props) => {
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, props.courses.length - page * rowsPerPage);
+    Math.min(rowsPerPage, props.labs.length - page * rowsPerPage);
 
   // handle open menu context when clicking account icon
   const handleOpenActionMenu = (event) => {
@@ -124,17 +120,17 @@ const CourseTable = (props) => {
   };
 
   return (
-    <div className={classes.courseTable}>
+    <div className={classes.labTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Courses"}>
+        <EnhancedToolbar title={"Laboratories"}>
           <Button
             className={classes.button}
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={props.onAddCourse}
+            onClick={props.onAddLab}
           >
-            New course
+            New lab
           </Button>
         </EnhancedToolbar>
         <TableContainer>
@@ -148,18 +144,17 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.courses, getComparator(order, orderBy))
+                {stableSort(props.labs, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <StyledTableRow key={row.id} className={classes.row}>
                       <TableCell component="th" scope="row">
                         {index + 1}
                       </TableCell>
-                      <TableCell align="left">{row.id}</TableCell>
                       <TableCell align="left">
-                        <Link to="/courses/id">{row.name}</Link>
+                        <Link to="/laboratories/id">{row.name}</Link>
                       </TableCell>
-                      <TableCell align="center">{row.credit}</TableCell>
+                      <TableCell align="center">{row.capacity}</TableCell>
                       <TableCell align="left">{row.createdAt}</TableCell>
                       <TableCell align="center">
                         <IconButton
@@ -215,7 +210,7 @@ const CourseTable = (props) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={props.courses.length}
+          count={props.labs.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -226,11 +221,11 @@ const CourseTable = (props) => {
   );
 };
 
-CourseTable.propTypes = {
-  courses: PropTypes.array.isRequired,
-  onAddCourse: PropTypes.func.isRequired,
+LaboratoryTable.propTypes = {
+  labs: PropTypes.array.isRequired,
+  onAddLab: PropTypes.func.isRequired,
   onEditClick: PropTypes.func.isRequired,
   onDeleteClick: PropTypes.func.isRequired,
 };
 
-export default CourseTable;
+export default LaboratoryTable;

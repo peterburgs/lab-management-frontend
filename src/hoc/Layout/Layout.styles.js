@@ -1,12 +1,9 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 const sideBarOpenWidth = 225;
-const sideBarCloseWidth = 60;
+const sideBarCloseWidth = 57;
 
 export default makeStyles((theme) => ({
-  appBarRegistration: {
-    backgroundColor: "#1A73E8 !important",
-  },
   userSectionRegistration: {
     "& p": {
       color: "#fff !important",
@@ -17,9 +14,9 @@ export default makeStyles((theme) => ({
   },
   appBar: {
     minHeight: 56,
+    background: "linear-gradient(to right, #00BDA0 , #007DDD) !important",
+    borderBottom: "none !important",
     [theme.breakpoints.up("md")]: {
-      background: "#F0F2F5",
-      borderBottom: "1px solid rgba(0,0,0,0.2)",
       width: `calc(100% - ${sideBarCloseWidth}px)`,
       marginLeft: sideBarCloseWidth,
       transition: theme.transitions.create(["width", "margin"], {
@@ -30,7 +27,6 @@ export default makeStyles((theme) => ({
   },
   appBarShift: {
     [theme.breakpoints.up("md")]: {
-      background: "#F0F2F5",
       width: `calc(100% - ${sideBarOpenWidth}px)`,
       marginLeft: sideBarOpenWidth,
       transition: theme.transitions.create(["width", "margin"], {
@@ -64,17 +60,14 @@ export default makeStyles((theme) => ({
     "& p": {
       margin: "0 0.5rem",
       display: "inline",
-      color: "#1B3A57",
+      color: "#fff",
       [theme.breakpoints.down("sm")]: {
         color: "#fff",
         display: "none",
       },
     },
     "& svg": {
-      color: "#1B3A57",
-      [theme.breakpoints.down("sm")]: {
-        color: "#fff",
-      },
+      color: "#fff",
     },
   },
 }));

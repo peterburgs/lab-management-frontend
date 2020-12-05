@@ -14,7 +14,7 @@ const SideBar = (props) => {
       <div className={classes.toolbar}>
         <IconButton
           aria-label="open drawer"
-          onClick={props.onToggle}
+          onClick={props.onToggleMaximize}
           className={classes.menuIcon}
         >
           <img alt="hamburger-icon" src={hamburgerIcon} />
@@ -37,6 +37,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/registration"
+          onSideBarClose={props.onMobileClose}
         >
           Registration
         </NavigationItem>
@@ -55,6 +56,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/courses"
+          onSideBarClose={props.onMobileClose}
         >
           Courses
         </NavigationItem>
@@ -74,7 +76,8 @@ const SideBar = (props) => {
               <path d="M5.60068 17.0313C5.60068 15.8846 6.16603 14.8466 7.07534 14.1016H6.30077C5.14269 14.1016 4.20051 13.313 4.20051 12.3438C4.20051 11.3745 5.14269 10.586 6.30049 10.586C6.30081 10.586 7.9161 10.5866 7.91601 10.5866C8.04272 10.5865 8.16701 10.5578 8.27571 10.5033L10.647 9.31469C11.7558 8.75891 12.1095 7.55508 11.4351 6.63231C10.77 5.72251 9.34189 5.43146 8.25158 5.98321L6.0998 7.07223C2.71815 7.1611 0 9.49168 0 12.3438C0 15.0535 2.45469 17.292 5.60068 17.5845V17.0313Z" />
             </svg>
           }
-          link="/labs"
+          link="/laboratories"
+          onSideBarClose={props.onMobileClose}
         >
           Laboratories
         </NavigationItem>
@@ -94,6 +97,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/requests"
+          onSideBarClose={props.onMobileClose}
         >
           Requests
         </NavigationItem>
@@ -111,6 +115,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/lecturers"
+          onSideBarClose={props.onMobileClose}
         >
           Lecturers
         </NavigationItem>
@@ -140,6 +145,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/schedule"
+          onSideBarClose={props.onMobileClose}
         >
           Schedule
         </NavigationItem>
@@ -157,6 +163,7 @@ const SideBar = (props) => {
             </svg>
           }
           link="/logs"
+          onSideBarClose={props.onMobileClose}
         >
           System logs
         </NavigationItem>
@@ -172,23 +179,23 @@ const SideBar = (props) => {
   return (
     <nav
       className={clsx(classes.drawer, {
-        [classes.drawerOpen]: props.open,
-        [classes.drawerClose]: !props.open,
+        [classes.drawerMaximized]: props.maximized,
+        [classes.drawerMinimized]: !props.maximized,
       })}
       aria-label="mailbox folders"
     >
-      <Hidden mdUp implementation="css">
+      <Hidden mdUp implementation="js">
         <Drawer
           container={container}
           variant="temporary"
           anchor="left"
           open={props.mobileOpen}
-          onClose={props.onMobileToggle}
+          onClose={props.onMobileClose}
           classes={{
             paper: classes.paperDrawer,
           }}
           ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
+            keepMounted: true,
           }}
         >
           {drawerContent}
@@ -199,8 +206,8 @@ const SideBar = (props) => {
           variant="permanent"
           classes={{
             paper: clsx(classes.paperDrawer, {
-              [classes.drawerOpen]: props.open,
-              [classes.drawerClose]: !props.open,
+              [classes.drawerMaximized]: props.maximized,
+              [classes.drawerMinimized]: !props.maximized,
             }),
             paperAnchorLeft: classes.paperAnchorLeft,
           }}
@@ -214,11 +221,11 @@ const SideBar = (props) => {
 };
 
 SideBar.propTypes = {
-  open: PropTypes.bool.isRequired,
+  maximized: PropTypes.bool.isRequired,
   mobileOpen: PropTypes.bool.isRequired,
-  onMobileToggle: PropTypes.func.isRequired,
+  onMobileClose: PropTypes.func.isRequired,
   window: PropTypes.object,
-  onToggle: PropTypes.func.isRequired,
+  onToggleMaximize: PropTypes.func.isRequired,
 };
 
 export default SideBar;

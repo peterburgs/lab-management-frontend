@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import {
-  IconButton,
   Paper,
   TableContainer,
   TableBody,
@@ -9,18 +8,14 @@ import {
   TableRow,
   TablePagination,
   Button,
-  Menu,
-  MenuItem,
 } from "@material-ui/core";
 import { Link } from "react-router-dom";
-import useStyles from "./CourseTable.styles";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import useStyles from "./RequestTable.styles";
 import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
-import AddIcon from "@material-ui/icons/Add";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -35,10 +30,7 @@ const CourseTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
-
-  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
-  const openActionMenu = Boolean(actionMenuAnchorEl);
+  const [orderBy, setOrderBy] = useState("id");
 
   const headCells = [
     {
@@ -50,17 +42,20 @@ const CourseTable = (props) => {
       label: "ID",
     },
     {
-      id: "name",
-      label: "Name",
+      id: "content",
+      label: "Request Content",
     },
     {
-      id: "credit",
-      isNumber: true,
-      label: "Credit",
+      id: "lecturer",
+      label: "Lecturer",
     },
     {
-      id: "createdAt",
-      label: "Created At",
+      id: "openDate",
+      label: "Open date",
+    },
+    {
+      id: "status",
+      label: "Status",
     },
     {
       id: "actions",
@@ -111,32 +106,12 @@ const CourseTable = (props) => {
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, props.courses.length - page * rowsPerPage);
-
-  // handle open menu context when clicking account icon
-  const handleOpenActionMenu = (event) => {
-    setActionMenuAnchorEl(event.currentTarget);
-  };
-
-  // handle close menu context when clicking account icon
-  const handleActionMenuClose = () => {
-    setActionMenuAnchorEl(null);
-  };
+    Math.min(rowsPerPage, props.requests.length - page * rowsPerPage);
 
   return (
-    <div className={classes.courseTable}>
+    <div className={classes.requestTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Courses"}>
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={props.onAddCourse}
-          >
-            New course
-          </Button>
-        </EnhancedToolbar>
+        <EnhancedToolbar title={"Requests"} />
         <TableContainer>
           <SimpleBar style={{ maxHeight: 400 }}>
             <Table style={{ minWidth: 700 }} stickyHeader>
@@ -148,7 +123,7 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.courses, getComparator(order, orderBy))
+                {stableSort(props.requests, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
                     <StyledTableRow key={row.id} className={classes.row}>
@@ -157,49 +132,13 @@ const CourseTable = (props) => {
                       </TableCell>
                       <TableCell align="left">{row.id}</TableCell>
                       <TableCell align="left">
-                        <Link to="/courses/id">{row.name}</Link>
+                        <Link to="/requests/id">{row.content}</Link>
                       </TableCell>
-                      <TableCell align="center">{row.credit}</TableCell>
-                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="left">{row.lecturer}</TableCell>
+                      <TableCell align="left">{row.openDate}</TableCell>
+                      <TableCell align="left">{row.status}</TableCell>
                       <TableCell align="center">
-                        <IconButton
-                          onClick={handleOpenActionMenu}
-                          style={{ padding: 0 }}
-                        >
-                          <MoreVertIcon />
-                        </IconButton>
-                        <Menu
-                          id="menu-appbar"
-                          anchorEl={actionMenuAnchorEl}
-                          anchorOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                          keepMounted
-                          transformOrigin={{
-                            vertical: "top",
-                            horizontal: "right",
-                          }}
-                          open={openActionMenu}
-                          onClose={handleActionMenuClose}
-                        >
-                          <MenuItem
-                            onClick={() => {
-                              props.onEditClick();
-                              setActionMenuAnchorEl(null);
-                            }}
-                          >
-                            Edit
-                          </MenuItem>
-                          <MenuItem
-                            onClick={() => {
-                              props.onDeleteClick();
-                              setActionMenuAnchorEl(null);
-                            }}
-                          >
-                            Delete
-                          </MenuItem>
-                        </Menu>
+                        <Button onClick={props.onResolve} variant="contained" color="secondary">Resolve</Button>
                       </TableCell>
                     </StyledTableRow>
                   ))}
@@ -215,7 +154,7 @@ const CourseTable = (props) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={props.courses.length}
+          count={props.requests.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -227,10 +166,8 @@ const CourseTable = (props) => {
 };
 
 CourseTable.propTypes = {
-  courses: PropTypes.array.isRequired,
-  onAddCourse: PropTypes.func.isRequired,
-  onEditClick: PropTypes.func.isRequired,
-  onDeleteClick: PropTypes.func.isRequired,
+  requests: PropTypes.array.isRequired,
+  onResolve: PropTypes.func.isRequired,
 };
 
 export default CourseTable;

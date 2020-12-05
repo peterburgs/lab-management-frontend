@@ -12,6 +12,7 @@ const NavigationItem = (props) => {
       exact
       activeClassName={classes.active}
       to={props.link}
+      onClick={props.onSideBarClose}
     >
       {props.icon ? props.icon : null}
       {props.children}
@@ -23,6 +24,7 @@ NavigationItem.propTypes = {
   link: PropTypes.string.isRequired,
   icon: PropTypes.object.isRequired,
   children: PropTypes.string.isRequired,
+  onSideBarClose: PropTypes.func.isRequired,
 };
 
 export default NavigationItem;

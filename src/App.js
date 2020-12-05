@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import React from "react";
-import Layout from "./hoc/Layout";
+import Layout from "./hoc/Layout/Layout";
 import useStyles from "./App.styles";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core";
 import { Switch, Route } from "react-router-dom";
@@ -12,6 +12,10 @@ import "fontsource-roboto";
 import Schedule from "./containers/Schedule/Schedule";
 import Registration from "./containers/Registration/Registration";
 import Course from "./containers/Course/Course";
+import Laboratory from './containers/Laboratory/Laboratory';
+import Request from './containers/Request/Request';
+import Lecturer from "./containers/Lecturer/Lecturer";
+import ContentContainer from "./hoc/ContentContainer/ContentContainer";
 
 const theme = createMuiTheme({
   palette: {
@@ -38,13 +42,36 @@ function App() {
         </Layout>
       </Route>
       <Route path="/registration">
-        <Layout registrationPage>
-          <Registration />
+        <Layout>
+          <ContentContainer>
+            <Registration />
+          </ContentContainer>
         </Layout>
       </Route>
       <Route path="/courses">
         <Layout>
-          <Course />
+          <ContentContainer>
+            <Course />
+          </ContentContainer>
+        </Layout>
+      </Route>
+      <Route path="/laboratories">
+        <Layout>
+          <ContentContainer>
+            <Laboratory />
+          </ContentContainer>
+        </Layout>
+      </Route>
+      <Route path="/requests">
+        <Layout>
+          <ContentContainer>
+            <Request />
+          </ContentContainer>
+        </Layout>
+      </Route>
+      <Route path="/lecturers">
+        <Layout>
+          <Lecturer />
         </Layout>
       </Route>
     </Switch>
