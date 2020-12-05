@@ -2,18 +2,20 @@ import React from "react";
 import {
   Dialog,
   DialogTitle,
+  DialogContent,
+  TextField,
   DialogActions,
   Button,
   Slide,
 } from "@material-ui/core";
-import useStyles from "./ConfirmDialog.styles";
+import useStyles from "./LecturerForm.styles";
 import PropTypes from "prop-types";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const ConfirmDialog = (props) => {
+const LecturerForm = (props) => {
   const classes = useStyles();
 
   return (
@@ -22,9 +24,29 @@ const ConfirmDialog = (props) => {
       open={props.isOpen}
       TransitionComponent={Transition}
       onClose={props.onCancel}
-      aria-labelledby="confirm-dialog-title"
+      aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="confirm-dialog-title">{props.title}</DialogTitle>
+      <DialogTitle id="form-dialog-title">Add a lecturer</DialogTitle>
+      <DialogContent>
+        <TextField
+          required
+          label="Lecturer ID"
+          variant="outlined"
+          className={classes.formElement}
+        />
+        <TextField
+          required
+          label="Lecturer name"
+          variant="outlined"
+          className={classes.formElement}
+        />
+        <TextField
+          required
+          label="Email address"
+          variant="outlined"
+          className={classes.formElement}
+        />
+      </DialogContent>
       <DialogActions style={{ padding: "16px 24px" }}>
         <Button onClick={props.onCancel} color="primary">
           Cancel
@@ -34,7 +56,7 @@ const ConfirmDialog = (props) => {
           disableElevation
           style={{ borderRadius: 8 }}
           onClick={props.onSubmit}
-          color="secondary"
+          color="primary"
         >
           Submit
         </Button>
@@ -43,11 +65,10 @@ const ConfirmDialog = (props) => {
   );
 };
 
-ConfirmDialog.propTypes = {
+LecturerForm.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
 };
 
-export default ConfirmDialog;
+export default LecturerForm;

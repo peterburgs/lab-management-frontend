@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import backgroundImage from "../../../assets/images/sidebar-background.png";
 
 const sideBarOpenWidth = 225;
-const sideBarCloseWidth = 60;
+const sideBarCloseWidth = 57;
 
 export default makeStyles((theme) => ({
   drawer: {
@@ -12,7 +12,7 @@ export default makeStyles((theme) => ({
       whiteSpace: "nowrap",
     },
   },
-  drawerOpen: {
+  drawerMaximized: {
     [theme.breakpoints.up("md")]: {
       width: sideBarOpenWidth,
       transition: theme.transitions.create("width", {
@@ -22,7 +22,7 @@ export default makeStyles((theme) => ({
       overflowX: "hidden",
     },
   },
-  drawerClose: {
+  drawerMinimized: {
     [theme.breakpoints.up("md")]: {
       flexShrink: 0,
       transition: theme.transitions.create("width", {

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  IconButton,
   Paper,
   TableContainer,
   TableBody,
@@ -7,51 +8,51 @@ import {
   TableCell,
   TableRow,
   TablePagination,
-  Button,
 } from "@material-ui/core";
-import useStyles from "./RegistrationTable.styles";
+import useStyles from "./LecturerTable.styles";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 
-const StyledTableRow = withStyles(() => ({
+const StyledTableRow = withStyles((theme) => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: `rgba(26, 115, 232, 0.1)`,
+      backgroundColor: theme.palette.action.hover,
     },
   },
 }))(TableRow);
 
-const RegistrationTable = (props) => {
+const LecturerTable = (props) => {
   const classes = useStyles();
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("lecturerId");
+  const [orderBy, setOrderBy] = useState("name");
 
   const headCells = [
     {
-      id: "#",
-      label: "#",
-    },
-    {
-      id: "lecturerId",
+      id: "id",
+      first: true,
       label: "Lecturer ID",
     },
     {
-      id: "lecturerName",
+      id: "name",
       label: "Lecturer name",
     },
     {
-      id: "courseName",
-      label: "Course name",
+      id: "email",
+      label: "Email address",
     },
     {
-      id: "group",
-      isNumber: true,
-      label: "Group",
+      id: "createdAt",
+      label: "Created At",
+    },
+    {
+      id: "actions",
+      label: "Actions",
     },
   ];
 
@@ -65,6 +66,8 @@ const RegistrationTable = (props) => {
   };
 
   const descendingComparator = (a, b, orderBy) => {
+    console.log(a);
+    console.log(orderBy);
     if (b[orderBy] < a[orderBy]) {
       return -1;
     }
@@ -98,35 +101,12 @@ const RegistrationTable = (props) => {
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, props.teachings.length - page * rowsPerPage);
-
-  const handleClick = (id) => {
-    console.log(id);
-  };
+    Math.min(rowsPerPage, props.lecturers.length - page * rowsPerPage);
 
   return (
-    <div className={classes.registrationTable}>
+    <div className={classes.lecturerTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Registration"}>
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="primary"
-          >
-            Generate lab usage
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            style={{
-              minWidth: 100,
-              backgroundColor: "#388E3C",
-              color: "#fff",
-            }}
-          >
-            Export
-          </Button>
-        </EnhancedToolbar>
+        <EnhancedToolbar title={"Lecturers"} />
         <TableContainer>
           <SimpleBar style={{ maxHeight: 300 }}>
             <Table style={{ minWidth: 700 }} stickyHeader>
@@ -138,22 +118,27 @@ const RegistrationTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.teachings, getComparator(order, orderBy))
+                {stableSort(props.lecturers, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row, index) => (
-                    <StyledTableRow
-                      className={classes.row}
-                      hover
-                      onClick={() => handleClick(row.id)}
-                      key={row.id}
-                    >
-                      <TableCell component="th" scope="row">
-                        {index + 1}
+                  .map((row) => (
+                    <StyledTableRow key={row.id}>
+                      <TableCell size="small" component="th" scope="row">
+                        {row.id}
                       </TableCell>
-                      <TableCell align="left">{row.lecturerId}</TableCell>
-                      <TableCell align="left">{row.lecturerName}</TableCell>
-                      <TableCell align="left">{row.courseName}</TableCell>
-                      <TableCell align="center">{row.group}</TableCell>
+                      <TableCell size="small" align="right">
+                        {row.name}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        {row.email}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        {row.createdAt}
+                      </TableCell>
+                      <TableCell size="small" align="right">
+                        <IconButton>
+                          <MoreVertIcon fontSize={"small"} />
+                        </IconButton>
+                      </TableCell>
                     </StyledTableRow>
                   ))}
                 {emptyRows > 0 && (
@@ -168,7 +153,7 @@ const RegistrationTable = (props) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={props.teachings.length}
+          count={props.lecturers.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -179,8 +164,8 @@ const RegistrationTable = (props) => {
   );
 };
 
-RegistrationTable.propTypes = {
-  teachings: PropTypes.array.isRequired,
+LecturerTable.propTypes = {
+  lecturers: PropTypes.array.isRequired,
 };
 
-export default RegistrationTable;
+export default LecturerTable;

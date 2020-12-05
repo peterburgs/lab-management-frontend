@@ -18,12 +18,13 @@ const EnhancedTableHead = (props) => {
       <TableRow>
         {props.headCells.map((headCell) => (
           <TableCell
-            size="small"
+            style={{ borderBottom: "none" }}
             key={headCell.id}
-            align={headCell.first ? "left" : "right"}
-            padding={"default"}
+            align={
+              headCell.isNumber || headCell.id === "actions" ? "center" : "left"
+            }
           >
-            {isAllowSort ? (
+            {isAllowSort && headCell.id !== "#" && headCell.id !== "actions" ? (
               <TableSortLabel
                 active={orderBy === headCell.id}
                 direction={orderBy === headCell.id ? order : "asc"}

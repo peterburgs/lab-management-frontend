@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import SideBar from "../components/Navigation/SideBar/SideBar";
+import SideBar from "../../components/Navigation/SideBar/SideBar";
 import {
   AppBar,
   Toolbar,
@@ -12,75 +12,80 @@ import {
 import useStyles from "./Layout.styles";
 import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
-import ElevationScroll from "../components/ElevationScroll/ElevationScroll";
+import ElevationScroll from "../../components/ElevationScroll/ElevationScroll";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import AccountCircle from "@material-ui/icons/AccountCircle";
-import RequestPending from "../components/RequestPending/RequestPending";
 import PropTypes from "prop-types";
 
+// Layout HOC includes AppBar and SideBar
 const Layout = (props) => {
-  const [sideBarOpened, setSideBarOpened] = useState(true);
-  const [sideBarMobileOpened, setSideBarMobileOpened] = useState(false);
+  const [maximizedSideBar, setMaximizedSideBar] = useState(true);
+  const [openedMobileSideBar, setOpenedMobileSideBar] = useState(false);
   const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
-  const open = Boolean(accountMenuAnchorEl);
+  const openAccountMenu = Boolean(accountMenuAnchorEl);
 
   const classes = useStyles();
 
-  const handleSidebarToggle = useCallback(() => {
-    if (sideBarOpened) {
-      setSideBarOpened(false);
+  // Handle maximize and minimize the side bar
+  const handleToggleMaximizeSidebar = useCallback(() => {
+    if (maximizedSideBar) {
+      setMaximizedSideBar(false);
     } else {
-      setSideBarOpened(true);
+      setMaximizedSideBar(true);
     }
-  }, [sideBarOpened]);
+  }, [maximizedSideBar]);
 
-  const handleSideBarMobileToggle = () => {
-    if (sideBarMobileOpened) {
-      setSideBarMobileOpened(false);
-    } else {
-      setSideBarMobileOpened(true);
-    }
-  };
+  // handle close side bar when mobile size
+  const handleCloseMobileSidebar = useCallback(() => {
+    setOpenedMobileSideBar(false);
+  });
 
+  // handle open side bar when mobile size
+  const handleOpenMobileSidebar = useCallback(() => {
+    setOpenedMobileSideBar(true);
+  });
+
+  // handle open menu context when clicking account icon
   const handleAccountMenu = (event) => {
     setAccountMenuAnchorEl(event.currentTarget);
   };
 
+  // handle close menu context when clicking account icon
   const handleAccountMenuClose = () => {
     setAccountMenuAnchorEl(null);
   };
 
+  const logout = () => {
+    console.log('Test');
+  }
+
   return (
     <React.Fragment>
       <SideBar
-        onMobileToggle={handleSideBarMobileToggle}
-        mobileOpen={sideBarMobileOpened}
-        onToggle={handleSidebarToggle}
-        open={sideBarOpened}
+        onMobileClose={handleCloseMobileSidebar}
+        mobileOpen={openedMobileSideBar}
+        onToggleMaximize={handleToggleMaximizeSidebar}
+        maximized={maximizedSideBar}
       />
       <ElevationScroll {...props}>
         <AppBar
           position="fixed"
           className={clsx(classes.appBar, {
-            [classes.appBarShift]: sideBarOpened,
-            [classes.appBarRegistration]: props.registrationPage,
+            [classes.appBarShift]: maximizedSideBar,
           })}
         >
           <Toolbar>
             <IconButton
               aria-label="open drawer"
-              onClick={handleSideBarMobileToggle}
+              onClick={handleOpenMobileSidebar}
               edge="start"
               className={classes.menuIcon}
             >
               <MenuIcon />
             </IconButton>
-            <RequestPending />
             <div className={classes.grow}></div>
             <div
-              className={clsx(classes.userSection, {
-                [classes.userSectionRegistration]: props.registrationPage,
-              })}
+              className={classes.userSection}
             >
               <IconButton
                 aria-label="show 17 new notifications"
@@ -112,23 +117,22 @@ const Layout = (props) => {
                   vertical: "top",
                   horizontal: "right",
                 }}
-                open={open}
+                open={openAccountMenu}
                 onClose={handleAccountMenuClose}
               >
-                <MenuItem onClick={handleAccountMenuClose}>Log out</MenuItem>
+                <MenuItem onClick={logout}>Log out</MenuItem>
               </Menu>
             </div>
           </Toolbar>
         </AppBar>
       </ElevationScroll>
-        <main className={classes.content}>{props.children}</main>
+      <main className={classes.content}>{props.children}</main>
     </React.Fragment>
   );
 };
 
 Layout.propTypes = {
   children: PropTypes.object.isRequired,
-  registrationPage: PropTypes.bool,
 };
 
 export default Layout;

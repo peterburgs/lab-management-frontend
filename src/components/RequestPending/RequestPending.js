@@ -6,7 +6,7 @@ const RequestPending = () => {
   const classes = useStyles();
 
   return (
-    <Paper className={classes.requestPending}>
+    <Paper elevation={6} className={classes.requestPending}>
       <Typography>
         A request is pending
       </Typography>
