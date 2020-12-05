@@ -8,14 +8,14 @@ import {
   Button,
   Slide,
 } from "@material-ui/core";
-import useStyles from "./LecturerForm.styles";
+import useStyles from "./LecturerDialog.styles";
 import PropTypes from "prop-types";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const LecturerForm = (props) => {
+const LecturerDialog = (props) => {
   const classes = useStyles();
 
   return (
@@ -26,7 +26,9 @@ const LecturerForm = (props) => {
       onClose={props.onCancel}
       aria-labelledby="form-dialog-title"
     >
-      <DialogTitle id="form-dialog-title">Add a lecturer</DialogTitle>
+      <DialogTitle id="form-dialog-title">
+        {props.isEdit ? "Edit lecturer" : "Add a lecturer"}
+      </DialogTitle>
       <DialogContent>
         <TextField
           required
@@ -36,13 +38,13 @@ const LecturerForm = (props) => {
         />
         <TextField
           required
-          label="Lecturer name"
+          label="Full name"
           variant="outlined"
           className={classes.formElement}
         />
         <TextField
           required
-          label="Email address"
+          label="Email"
           variant="outlined"
           className={classes.formElement}
         />
@@ -65,10 +67,11 @@ const LecturerForm = (props) => {
   );
 };
 
-LecturerForm.propTypes = {
+LecturerDialog.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
+  isEdit: PropTypes.bool.isRequired,
 };
 
-export default LecturerForm;
+export default LecturerDialog;

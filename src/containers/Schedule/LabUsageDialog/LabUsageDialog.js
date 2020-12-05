@@ -14,14 +14,14 @@ import {
   Button,
   Slide,
 } from "@material-ui/core";
-import useStyles from "./LabUsageForm.styles";
+import useStyles from "./LabUsageDialog.styles";
 import PropTypes from "prop-types";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const LabUsageForm = (props) => {
+const LabUsageDialog = (props) => {
   const classes = useStyles();
 
   return (
@@ -197,10 +197,10 @@ const LabUsageForm = (props) => {
   );
 };
 
-LabUsageForm.propTypes = {
+LabUsageDialog.propTypes = {
   onCancel: PropTypes.func.isRequired,
   onSubmit: PropTypes.func.isRequired,
   isOpen: PropTypes.bool.isRequired,
 };
 
-export default LabUsageForm;
+export default LabUsageDialog;

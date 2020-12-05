@@ -8,7 +8,11 @@ import {
   TableCell,
   TableRow,
   TablePagination,
+  Button,
+  Menu,
+  MenuItem,
 } from "@material-ui/core";
+import { Link } from "react-router-dom";
 import useStyles from "./LecturerTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PropTypes from "prop-types";
@@ -16,11 +20,12 @@ import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableTool
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
+import AddIcon from "@material-ui/icons/Add";
 
-const StyledTableRow = withStyles((theme) => ({
+const StyledTableRow = withStyles(() => ({
   root: {
     "&:nth-of-type(odd)": {
-      backgroundColor: theme.palette.action.hover,
+      backgroundColor: `rgba(26, 115, 232, 0.1)`,
     },
   },
 }))(TableRow);
@@ -32,19 +37,25 @@ const LecturerTable = (props) => {
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("name");
 
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
+  const openActionMenu = Boolean(actionMenuAnchorEl);
+
   const headCells = [
     {
+      id: "#",
+      label: "#",
+    },
+    {
       id: "id",
-      first: true,
-      label: "Lecturer ID",
+      label: "ID",
     },
     {
-      id: "name",
-      label: "Lecturer name",
+      id: "fullName",
+      label: "Full name",
     },
     {
-      id: "email",
-      label: "Email address",
+      id: "Email",
+      label: "email",
     },
     {
       id: "createdAt",
@@ -66,8 +77,6 @@ const LecturerTable = (props) => {
   };
 
   const descendingComparator = (a, b, orderBy) => {
-    console.log(a);
-    console.log(orderBy);
     if (b[orderBy] < a[orderBy]) {
       return -1;
     }
@@ -103,12 +112,32 @@ const LecturerTable = (props) => {
     rowsPerPage -
     Math.min(rowsPerPage, props.lecturers.length - page * rowsPerPage);
 
+  // handle open menu context when clicking account icon
+  const handleOpenActionMenu = (event) => {
+    setActionMenuAnchorEl(event.currentTarget);
+  };
+
+  // handle close menu context when clicking account icon
+  const handleActionMenuClose = () => {
+    setActionMenuAnchorEl(null);
+  };
+
   return (
     <div className={classes.lecturerTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Lecturers"} />
+        <EnhancedToolbar title={"Lecturers"}>
+          <Button
+            className={classes.button}
+            variant="contained"
+            color="primary"
+            startIcon={<AddIcon />}
+            onClick={props.onAddLecturer}
+          >
+            New lecturer
+          </Button>
+        </EnhancedToolbar>
         <TableContainer>
-          <SimpleBar style={{ maxHeight: 300 }}>
+          <SimpleBar style={{ maxHeight: 400 }}>
             <Table style={{ minWidth: 700 }} stickyHeader>
               <EnhancedTableHead
                 order={order}
@@ -120,24 +149,56 @@ const LecturerTable = (props) => {
               <TableBody>
                 {stableSort(props.lecturers, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <StyledTableRow key={row.id}>
-                      <TableCell size="small" component="th" scope="row">
-                        {row.id}
+                  .map((row, index) => (
+                    <StyledTableRow key={row.id} className={classes.row}>
+                      <TableCell component="th" scope="row">
+                        {index + 1}
                       </TableCell>
-                      <TableCell size="small" align="right">
-                        {row.name}
+                      <TableCell align="left">{row.id}</TableCell>
+                      <TableCell align="left">
+                        <Link to="/lecturers/id">{row.fullName}</Link>
                       </TableCell>
-                      <TableCell size="small" align="right">
-                        {row.email}
-                      </TableCell>
-                      <TableCell size="small" align="right">
-                        {row.createdAt}
-                      </TableCell>
-                      <TableCell size="small" align="right">
-                        <IconButton>
-                          <MoreVertIcon fontSize={"small"} />
+                      <TableCell align="left">{row.email}</TableCell>
+                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          onClick={handleOpenActionMenu}
+                          style={{ padding: 0 }}
+                        >
+                          <MoreVertIcon />
                         </IconButton>
+                        <Menu
+                          id="menu-appbar"
+                          anchorEl={actionMenuAnchorEl}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          keepMounted
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          open={openActionMenu}
+                          onClose={handleActionMenuClose}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              props.onEditClick();
+                              setActionMenuAnchorEl(null);
+                            }}
+                          >
+                            Edit
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              props.onDeleteClick();
+                              setActionMenuAnchorEl(null);
+                            }}
+                          >
+                            Delete
+                          </MenuItem>
+                        </Menu>
                       </TableCell>
                     </StyledTableRow>
                   ))}
@@ -166,6 +227,9 @@ const LecturerTable = (props) => {
 
 LecturerTable.propTypes = {
   lecturers: PropTypes.array.isRequired,
+  onAddLecturer: PropTypes.func.isRequired,
+  onEditClick: PropTypes.func.isRequired,
+  onDeleteClick: PropTypes.func.isRequired,
 };
 
 export default LecturerTable;

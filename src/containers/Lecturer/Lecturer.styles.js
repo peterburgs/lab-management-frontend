@@ -5,15 +5,10 @@ export default makeStyles((theme) => ({
     paddingTop: 24,
   },
   paper: {
-    padding: "0.5rem",
     borderRadius: 8,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-  },
-  button: {
-    borderRadius: 8,
-    textTransform: "none",
   },
   dialog: {
     borderRadius: 16,

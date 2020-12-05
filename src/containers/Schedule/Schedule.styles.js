@@ -2,7 +2,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles((theme) => ({
   schedule: {
-    paddingTop: 12,
+    paddingTop: 24,
   },
   button: {
     borderRadius: 8,
@@ -30,5 +30,11 @@ export default makeStyles((theme) => ({
     "& p": {
       marginLeft: "0.5rem",
     },
+  },
+  paper: {
+    width: '100%',
+    borderRadius: 8,
+    display: "flex",
+    padding: '0.5rem',
   },
 }));

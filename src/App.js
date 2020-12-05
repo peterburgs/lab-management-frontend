@@ -12,8 +12,8 @@ import "fontsource-roboto";
 import Schedule from "./containers/Schedule/Schedule";
 import Registration from "./containers/Registration/Registration";
 import Course from "./containers/Course/Course";
-import Laboratory from './containers/Laboratory/Laboratory';
-import Request from './containers/Request/Request';
+import Laboratory from "./containers/Laboratory/Laboratory";
+import Request from "./containers/Request/Request";
 import Lecturer from "./containers/Lecturer/Lecturer";
 import ContentContainer from "./hoc/ContentContainer/ContentContainer";
 
@@ -38,7 +38,9 @@ function App() {
     <Switch>
       <Route path="/schedule">
         <Layout>
-          <Schedule />
+          <ContentContainer>
+            <Schedule />
+          </ContentContainer>
         </Layout>
       </Route>
       <Route path="/registration">
@@ -71,7 +73,9 @@ function App() {
       </Route>
       <Route path="/lecturers">
         <Layout>
-          <Lecturer />
+          <ContentContainer>
+            <Lecturer />
+          </ContentContainer>
         </Layout>
       </Route>
     </Switch>

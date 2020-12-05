@@ -1,75 +1,116 @@
 import React, { useState } from "react";
+import { Route, useHistory, useRouteMatch } from "react-router-dom";
 import useStyles from "./Lecturer.styles";
-import { Grid, Paper, IconButton, InputBase, Button } from "@material-ui/core";
+import { Grid, Paper, IconButton, InputBase } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
-import AddIcon from "@material-ui/icons/Add";
 import LecturerTable from "./LecturerTable/LecturerTable";
-import LecturerForm from "./LecturerForm/LecturerForm";
+import LecturerDialog from "./LecturerDialog/LecturerDialog";
+import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 
 const Lecturer = () => {
   const classes = useStyles();
-  const [lecturerFormOpened, setLecturerFormOpened] = useState(false);
+  const [openedLecturerDialog, setOpenedLecturerDialog] = useState(false);
+  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
+  const history = useHistory();
+  const match = useRouteMatch();
 
   const [lecturers] = useState([
     {
       id: 123,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 124,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 125,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 126,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 127,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
     {
       id: 128,
-      name: "Le Vinh Thinh",
+      fullName: "Le Vinh Thinh",
       email: "123@gmail.com",
       createdAt: "11/12/2020 7:00 AM",
     },
   ]);
 
-  const handleAddLecturer = () => {
-    setLecturerFormOpened(true);
+  // handle "New lecturer" button click
+  const handleNewLecturerButtonClick = () => {
+    setOpenedLecturerDialog(true);
   };
 
-  const handleSubmitAddLecturer = () => {
-    setLecturerFormOpened(false);
+  // handle submit button click in course dialog
+  const handleLecturerDialogSubmitButtonClick = () => {
+    setOpenedLecturerDialog(false);
   };
 
-  const handleCancelAddLecturer = () => {
-    setLecturerFormOpened(false);
+  // handle cancel button click in course dialog
+  const handleLecturerDialogCancelButtonClick = () => {
+    history.replace("/lecturers");
+    if (openedLecturerDialog) {
+      setOpenedLecturerDialog(false);
+    }
+  };
+
+  const handleDeleteClick = () => {
+    setOpenedConfirmDialog(true);
+  };
+
+  const handleEditClick = () => {
+    history.replace("/lecturers/id");
+  };
+
+  // handle submit button click in confirm dialog
+  const handleConfirmDialogSubmitButtonClick = () => {
+    setOpenedConfirmDialog(false);
+  };
+
+  // handle cancel button click in confirm dialog
+  const handleConfirmDialogCancelButtonClick = () => {
+    setOpenedConfirmDialog(false);
   };
 
   return (
     <div className={classes.lecturer}>
-      <LecturerForm
-        isOpen={lecturerFormOpened}
-        onCancel={handleCancelAddLecturer}
-        onSubmit={handleSubmitAddLecturer}
+      <Route path={match.path + "/id"}>
+        <LecturerDialog
+          isOpen={true}
+          onCancel={handleLecturerDialogCancelButtonClick}
+          onSubmit={handleLecturerDialogSubmitButtonClick}
+        />
+      </Route>
+      <LecturerDialog
+          isOpen={openedLecturerDialog}
+          onCancel={handleLecturerDialogCancelButtonClick}
+          onSubmit={handleLecturerDialogSubmitButtonClick}
+        />
+      <ConfirmDialog
+        isOpen={openedConfirmDialog}
+        onCancel={handleConfirmDialogCancelButtonClick}
+        onSubmit={handleConfirmDialogSubmitButtonClick}
+        title="Do you want to delete the lecturer?"
       />
       <Grid container justify="center">
-        <Grid item xs={10}>
+        <Grid item xs={11}>
           <Paper component="form" className={classes.paper}>
             <IconButton
               type="submit"
@@ -80,24 +121,18 @@ const Lecturer = () => {
             </IconButton>
             <InputBase
               className={classes.input}
-              placeholder="Enter course ID or course name"
-              inputProps={{ "aria-label": "enter course id or course name" }}
+              placeholder="Enter lecturer ID or name"
+              inputProps={{ "aria-label": "enter lecturer ID or name" }}
             />
           </Paper>
         </Grid>
-        <Grid style={{ marginTop: 24 }} item xs={10}>
-          <Button
-            className={classes.button}
-            variant="contained"
-            color="primary"
-            startIcon={<AddIcon />}
-            onClick={handleAddLecturer}
-          >
-            Add a lecturer
-          </Button>
-        </Grid>
-        <Grid style={{ marginTop: 24 }} item xs={10}>
-          <LecturerTable lecturers={lecturers} />
+        <Grid style={{ marginTop: 24 }} item xs={11}>
+          <LecturerTable
+            onDeleteClick={handleDeleteClick}
+            onEditClick={handleEditClick}
+            onAddCourse={handleNewLecturerButtonClick}
+            lecturers={lecturers}
+          />
         </Grid>
       </Grid>
     </div>
