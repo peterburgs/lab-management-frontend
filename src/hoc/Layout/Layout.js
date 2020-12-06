@@ -14,8 +14,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
 import ElevationScroll from "../../components/ElevationScroll/ElevationScroll";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import AccountCircle from "@material-ui/icons/AccountCircle";
 import PropTypes from "prop-types";
+import { useHistory } from "react-router-dom";
 
 // Layout HOC includes AppBar and SideBar
 const Layout = (props) => {
@@ -23,6 +23,7 @@ const Layout = (props) => {
   const [openedMobileSideBar, setOpenedMobileSideBar] = useState(false);
   const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
   const openAccountMenu = Boolean(accountMenuAnchorEl);
+  const history = useHistory();
 
   const classes = useStyles();
 
@@ -56,8 +57,11 @@ const Layout = (props) => {
   };
 
   const logout = () => {
-    console.log('Test');
-  }
+    history.replace("/logout");
+  };
+
+  const name = localStorage.getItem('name');
+  const imageUrl = localStorage.getItem('imageUrl');
 
   return (
     <React.Fragment>
@@ -84,9 +88,7 @@ const Layout = (props) => {
               <MenuIcon />
             </IconButton>
             <div className={classes.grow}></div>
-            <div
-              className={classes.userSection}
-            >
+            <div className={classes.userSection}>
               <IconButton
                 aria-label="show 17 new notifications"
                 color="inherit"
@@ -95,7 +97,7 @@ const Layout = (props) => {
                   <NotificationsIcon />
                 </Badge>
               </IconButton>
-              <Typography>Le Duc Thinh</Typography>
+              <Typography>{name}</Typography>
               <IconButton
                 edge="end"
                 aria-label="account of current user"
@@ -103,7 +105,7 @@ const Layout = (props) => {
                 color="inherit"
                 onClick={handleAccountMenu}
               >
-                <AccountCircle />
+                <img style={{width: 25, height: 25, borderRadius: 16}} alt="account-image" src={imageUrl} />
               </IconButton>
               <Menu
                 id="menu-appbar"

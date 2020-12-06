@@ -233,7 +233,7 @@ const TimeTable = (props) => {
                       size="small"
                       key={headCell.id}
                       align={"center"}
-                      style={{ borderLeft: "1px solid rgba(0,0,0,0.1)" }}
+                      style={{ borderLeft: "1px solid rgba(0,0,0,0.1)", zIndex: 1100 }}
                     >
                       {headCell.label}
                     </TableCell>

@@ -3,9 +3,10 @@ import React from "react";
 import Layout from "./hoc/Layout/Layout";
 import useStyles from "./App.styles";
 import { ThemeProvider, createMuiTheme } from "@material-ui/core";
-import { Switch, Route } from "react-router-dom";
+import { Switch, Route, Redirect } from "react-router-dom";
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import MomentUtils from "@date-io/moment";
+import { useSelector } from "react-redux";
 
 import "fontsource-roboto";
 
@@ -16,6 +17,9 @@ import Laboratory from "./containers/Laboratory/Laboratory";
 import Request from "./containers/Request/Request";
 import Lecturer from "./containers/Lecturer/Lecturer";
 import ContentContainer from "./hoc/ContentContainer/ContentContainer";
+import Auth from "./containers/Auth/Auth";
+import ResolveAuth from "./containers/Auth/ResolveAuth/ResolveAuth";
+import Logout from "./containers/Auth/Logout/Logout";
 
 const theme = createMuiTheme({
   palette: {
@@ -34,52 +38,75 @@ const theme = createMuiTheme({
 
 function App() {
   const classes = useStyles();
+  const isAuthenticated = useSelector((state) => state.auth.token !== null);
+
   let routes = (
     <Switch>
-      <Route path="/schedule">
-        <Layout>
-          <ContentContainer>
-            <Schedule />
-          </ContentContainer>
-        </Layout>
+      <Route path="/signin">
+        <Auth />
       </Route>
-      <Route path="/registration">
-        <Layout>
-          <ContentContainer>
-            <Registration />
-          </ContentContainer>
-        </Layout>
-      </Route>
-      <Route path="/courses">
-        <Layout>
-          <ContentContainer>
-            <Course />
-          </ContentContainer>
-        </Layout>
-      </Route>
-      <Route path="/laboratories">
-        <Layout>
-          <ContentContainer>
-            <Laboratory />
-          </ContentContainer>
-        </Layout>
-      </Route>
-      <Route path="/requests">
-        <Layout>
-          <ContentContainer>
-            <Request />
-          </ContentContainer>
-        </Layout>
-      </Route>
-      <Route path="/lecturers">
-        <Layout>
-          <ContentContainer>
-            <Lecturer />
-          </ContentContainer>
-        </Layout>
+      <Route path="/">
+        <ResolveAuth />
       </Route>
     </Switch>
   );
+
+  if (isAuthenticated) {
+    routes = (
+      <Switch>
+        <Route path="/" exact>
+          <Redirect to="/registration" />
+        </Route>
+        <Route path="/schedule">
+          <Layout>
+            <ContentContainer>
+              <Schedule />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/registration">
+          <Layout>
+            <ContentContainer>
+              <Registration />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/courses">
+          <Layout>
+            <ContentContainer>
+              <Course />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/laboratories">
+          <Layout>
+            <ContentContainer>
+              <Laboratory />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/requests">
+          <Layout>
+            <ContentContainer>
+              <Request />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/lecturers">
+          <Layout>
+            <ContentContainer>
+              <Lecturer />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/logout">
+          <Logout />
+        </Route>
+        <Redirect to="/" />
+      </Switch>
+    );
+  }
+
   return (
     <ThemeProvider theme={theme}>
       <MuiPickersUtilsProvider utils={MomentUtils}>
