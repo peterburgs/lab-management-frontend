@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles({
+export default makeStyles((theme) => ({
   formElement: {
     marginBottom: "1rem",
     width: "100%",
@@ -8,4 +8,12 @@ export default makeStyles({
   dialog: {
     borderRadius: 8,
   },
-});
+  buttonProgress: {
+    color: theme.palette.primary,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
+}));

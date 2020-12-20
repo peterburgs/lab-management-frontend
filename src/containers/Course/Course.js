@@ -6,6 +6,7 @@ import SearchIcon from "@material-ui/icons/Search";
 import CourseTable from "./CourseTable/CourseTable";
 import CourseDialog from "./CourseDialog/CourseDialog";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
+import { useSelector, useDispatch } from "react-redux";
 
 const Course = () => {
   const classes = useStyles();
@@ -14,44 +15,8 @@ const Course = () => {
   const history = useHistory();
   const match = useRouteMatch();
 
-  const [courses] = useState([
-    {
-      id: 123,
-      name: "Intro to programming",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 124,
-      name: "Intro to IT",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 125,
-      name: "Database System",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 126,
-      name: "Database Management System",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 127,
-      name: "Programming Technique",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 128,
-      name: "Networking Essentials",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-  ]);
+  // Application state
+  const courses = useSelector((state) => state.courses.courses);
 
   // handle "New course" button click
   const handleNewCourseButtonClick = () => {

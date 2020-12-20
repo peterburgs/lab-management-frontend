@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   token: null,
-  userRole: 'lecturer',
+  userRole: 'admin',
 };
 
 const authSlice = createSlice({

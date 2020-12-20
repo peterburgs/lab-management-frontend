@@ -16,6 +16,7 @@ import ElevationScroll from "../../components/ElevationScroll/ElevationScroll";
 import NotificationsIcon from "@material-ui/icons/Notifications";
 import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 // Layout HOC includes AppBar and SideBar
 const Layout = (props) => {
@@ -24,8 +25,8 @@ const Layout = (props) => {
   const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
   const openAccountMenu = Boolean(accountMenuAnchorEl);
   const history = useHistory();
-
   const classes = useStyles();
+  const userRole = useSelector((state) => state.auth.userRole);
 
   // Handle maximize and minimize the side bar
   const handleToggleMaximizeSidebar = useCallback(() => {
@@ -60,8 +61,8 @@ const Layout = (props) => {
     history.replace("/logout");
   };
 
-  const name = localStorage.getItem('name');
-  const imageUrl = localStorage.getItem('imageUrl');
+  const name = localStorage.getItem("name");
+  const imageUrl = localStorage.getItem("imageUrl");
 
   return (
     <React.Fragment>
@@ -70,6 +71,7 @@ const Layout = (props) => {
         mobileOpen={openedMobileSideBar}
         onToggleMaximize={handleToggleMaximizeSidebar}
         maximized={maximizedSideBar}
+        userRole={userRole}
       />
       <ElevationScroll {...props}>
         <AppBar
@@ -105,7 +107,11 @@ const Layout = (props) => {
                 color="inherit"
                 onClick={handleAccountMenu}
               >
-                <img style={{width: 25, height: 25, borderRadius: 16}} alt="account-image" src={imageUrl} />
+                <img
+                  style={{ width: 25, height: 25, borderRadius: 16 }}
+                  alt="account-image"
+                  src={imageUrl}
+                />
               </IconButton>
               <Menu
                 id="menu-appbar"
@@ -122,7 +128,7 @@ const Layout = (props) => {
                 open={openAccountMenu}
                 onClose={handleAccountMenuClose}
               >
-                <MenuItem onClick={logout}>Log out</MenuItem>
+                <MenuItem onClick={logout}>Log Out</MenuItem>
               </Menu>
             </div>
           </Toolbar>

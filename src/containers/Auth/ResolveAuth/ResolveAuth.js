@@ -24,7 +24,7 @@ const ResolveAuth = () => {
         history.replace("/signin");
       }
     }
-  }, []);
+  }, [dispatch, history]);
 
   return null;
 };
