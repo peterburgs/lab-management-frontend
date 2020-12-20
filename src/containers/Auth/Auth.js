@@ -22,6 +22,7 @@ const Auth = () => {
     const expirationDate = new Date(
       new Date().getTime() + res.tokenObj.expires_in * 1000
     );
+    console.log("Set Item");
     localStorage.setItem("token", res.tokenObj.id_token);
     localStorage.setItem("expirationDate", expirationDate);
     localStorage.setItem("name", res.profileObj.name);

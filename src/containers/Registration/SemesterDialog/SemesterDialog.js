@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
 import useStyles from "./SemesterDialog.styles";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import CustomizedSnackbar from "../../../components/CustomizedSnackbar/CustomizedSnackbar";
 import { useSelector, useDispatch } from "react-redux";
@@ -36,13 +36,14 @@ const useUpdateSemester = () => {
 
   const handleUpdateSemester = useCallback(
     async (semester) => {
-      console.log(semester);
       const stabilizedSemester = produce(semester, (draft) => {
         draft.startDate = new Date(draft.startDate).toISOString();
       });
 
       try {
-        const res = await dispatch(updateSemester(stabilizedSemester));
+        const res = await dispatch(
+          updateSemester(stabilizedSemester)
+        );
         unwrapResult(res);
       } catch (err) {
         console.log(err);
@@ -51,7 +52,11 @@ const useUpdateSemester = () => {
     [dispatch]
   );
 
-  return [updateSemesterStatus, updateSemesterError, handleUpdateSemester];
+  return [
+    updateSemesterStatus,
+    updateSemesterError,
+    handleUpdateSemester,
+  ];
 };
 
 // Hook to handle start semester
@@ -83,7 +88,11 @@ const useStartSemester = () => {
     [dispatch]
   );
 
-  return [startSemesterStatus, startSemesterError, handleStartSemester];
+  return [
+    startSemesterStatus,
+    startSemesterError,
+    handleStartSemester,
+  ];
 };
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -93,7 +102,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const SemesterDialog = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { register, handleSubmit, errors } = useForm();
+  const { register, handleSubmit, errors, control } = useForm();
   const [
     updateSemesterStatus,
     updateSemesterError,
@@ -131,12 +140,15 @@ const SemesterDialog = (props) => {
     <React.Fragment>
       <CustomizedSnackbar
         open={
-          updateSemesterStatus === "failed" || startSemesterStatus === "failed"
+          updateSemesterStatus === "failed" ||
+          startSemesterStatus === "failed"
             ? true
             : false
         }
         onClose={() => handleClose(props.isEdit)}
-        message={props.isEdit ? updateSemesterError : startSemesterError}
+        message={
+          props.isEdit ? updateSemesterError : startSemesterError
+        }
         severity="error"
       />
       <CustomizedSnackbar
@@ -173,39 +185,59 @@ const SemesterDialog = (props) => {
               inputRef={register({ required: true })}
               label="Semester name"
               variant="outlined"
-              defaultValue={props.semester ? props.semester.semesterName : null}
+              defaultValue={
+                props.semester ? props.semester.semesterName : null
+              }
               className={classes.formElement}
               error={Boolean(errors.semesterName)}
               helperText={
                 errors.semesterName ? "*This field is required" : null
               }
             />
-            <DateTimePicker
-              id="startDate"
+
+            {/* Copied from RegistrationDialog.js */}
+            <Controller
               name="startDate"
-              label="Start date"
-              inputVariant="outlined"
-              format="DD/MM/yyyy HH:mm"
-              disablePast
-              className={classes.formElement}
-              inputRef={register({ required: true })}
+              control={control}
+              defaultValue={true}
+              rules={{ required: true }}
+              render={(props) => (
+                <DateTimePicker
+                  label="Start date"
+                  inputVariant="outlined"
+                  format="DD/MM/yyyy HH:mm"
+                  disablePast
+                  className={classes.formElement}
+                  onChange={(value) => props.onChange(value)}
+                  value={props.value}
+                />
+              )}
             />
+            {/* End */}
             <TextField
               id="numberOfWeeks"
               name="numberOfWeeks"
               label="Number of weeks"
               variant="outlined"
-              defaultValue={props.semester ? props.semester.numberOfWeeks : null}
+              defaultValue={
+                props.semester ? props.semester.numberOfWeeks : null
+              }
               inputRef={register({ required: true })}
               className={classes.formElement}
               error={Boolean(errors.numberOfWeeks)}
               helperText={
-                errors.numberOfWeeks ? "*This field is required" : null
+                errors.numberOfWeeks
+                  ? "*This field is required"
+                  : null
               }
             />
           </DialogContent>
           <DialogActions style={{ padding: "16px 24px" }}>
-            <Button type="button" onClick={props.onCancel} color="primary">
+            <Button
+              type="button"
+              onClick={props.onCancel}
+              color="primary"
+            >
               Cancel
             </Button>
             <div style={{ position: "relative" }}>
