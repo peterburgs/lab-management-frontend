@@ -121,7 +121,7 @@ const registrationSlice = createSlice({
     },
     [updateSemester.fulfilled]: (state, action) => {
       state.updateSemesterStatus = "succeeded";
-      state.semester = action.payload;
+      state.semester = action.payload.semester;
     },
     [updateSemester.rejected]: (state, action) => {
       state.updateSemesterError = action.payload;
