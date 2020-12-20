@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles({
+export default makeStyles((theme) => ({
   formElement: {
     marginBottom: "1rem",
     width: "100%",
@@ -9,13 +9,15 @@ export default makeStyles({
     borderRadius: 8,
     minWidth: 500,
   },
-  appliedCourses: {
-    display: 'flex',
-    flexDirection: 'row',
-    marginBottom: '1rem',
-    flexWrap: 'wrap'
-  },
   card: {
-    marginTop: '1rem',
-  }
-});
+    marginTop: "1rem",
+  },
+  buttonProgress: {
+    color: theme.palette.primary,
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12,
+  },
+}));

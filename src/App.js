@@ -20,6 +20,7 @@ import ContentContainer from "./hoc/ContentContainer/ContentContainer";
 import Auth from "./containers/Auth/Auth";
 import ResolveAuth from "./containers/Auth/ResolveAuth/ResolveAuth";
 import Logout from "./containers/Auth/Logout/Logout";
+import LecturerRegistration from "./containers/LecturerRegistration/LecturerRegistration";
 
 const theme = createMuiTheme({
   palette: {
@@ -39,19 +40,21 @@ const theme = createMuiTheme({
 function App() {
   const classes = useStyles();
   const isAuthenticated = useSelector((state) => state.auth.token !== null);
+  const userRole = useSelector((state) => state.auth.userRole);
 
   let routes = (
     <Switch>
+      <Route path="/" exact>
+        <ResolveAuth />
+      </Route>
       <Route path="/signin">
         <Auth />
       </Route>
-      <Route path="/">
-        <ResolveAuth />
-      </Route>
+      <Redirect to="/" />
     </Switch>
   );
 
-  if (isAuthenticated) {
+  if (isAuthenticated && userRole === "admin") {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -101,6 +104,30 @@ function App() {
         </Route>
         <Route path="/logout">
           <Logout />
+        </Route>
+        <Redirect to="/" />
+      </Switch>
+    );
+  }
+  if (isAuthenticated && userRole === "lecturer") {
+    routes = (
+      <Switch>
+        <Route path="/" exact>
+          <Redirect to="/registration" />
+        </Route>
+        <Route path="/schedule">
+          <Layout>
+            <ContentContainer>
+              <Schedule />
+            </ContentContainer>
+          </Layout>
+        </Route>
+        <Route path="/registration">
+          <Layout>
+            <ContentContainer>
+              <LecturerRegistration />
+            </ContentContainer>
+          </Layout>
         </Route>
         <Redirect to="/" />
       </Switch>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -8,7 +8,6 @@ import {
   DialogActions,
   Button,
   Slide,
-  FormGroup,
   FormControlLabel,
   Checkbox,
   Typography,
@@ -18,152 +17,203 @@ import {
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
 import useStyles from "./RegistrationDialog.styles";
-import PropTypes from "prop-types";
 import produce from "immer";
+import { useForm, Controller } from "react-hook-form";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import CustomizedSnackbar from "../../../components/CustomizedSnackbar/CustomizedSnackbar";
+import CheckboxList from "../../../components/CheckboxList/CheckboxList";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  openRegistration,
+  openRegistrationRefreshed,
+} from "../RegistrationSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const useOpenRegistration = () => {
+  const dispatch = useDispatch();
+
+  const openRegistrationStatus = useSelector(
+    (state) => state.registration.openRegistrationStatus
+  );
+
+  const openRegistrationError = useSelector(
+    (state) => state.registration.openRegistrationError
+  );
+
+  const handleOpenRegistration = useCallback(
+    async (registration) => {
+      try {
+        const res = await dispatch(openRegistration(registration));
+        unwrapResult(res);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [dispatch]
+  );
+
+  return [
+    openRegistrationStatus,
+    openRegistrationError,
+    handleOpenRegistration,
+  ];
+};
+
 const RegistrationDialog = (props) => {
   const classes = useStyles();
 
-  // Form state
-  const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
-  const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(true);
-  const [appliedCourses, setAppliedCourses] = useState([]);
-  const [courseToAdd, setCourseToAdd] = useState("");
+  const dispatch = useDispatch();
+  const { register, handleSubmit, errors, control } = useForm();
+  const [
+    openRegistrationStatus,
+    openRegistrationError,
+    handleOpenRegistration,
+  ] = useOpenRegistration();
 
-  const handleApplyToAllCourses = (e) => {
-    setIsAllCoursesApplied(e.target.checked);
-  };
+  const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(true);
+  const [courses, setCourses] = useState([]);
+  const [courseToSearch, setCourseToSearch] = useState("");
+  const [searchCourseResult, setSearchCourseResult] = useState([]);
 
   const handleDeleteCourse = (course) => {
-    setAppliedCourses((addedCourse) => {
-      return addedCourse.filter((c) => c !== course);
+    setCourses((courses) => {
+      return courses.filter((c) => c !== course);
     });
   };
 
-  const handleAddCourse = () => {
-    setAppliedCourses(
-      produce((draft) => {
-        draft.push(courseToAdd);
-      })
-    );
+  const onSubmit = (data) => {
+    console.log(data);
   };
 
-  return (
-    <Dialog
-      classes={{ paper: classes.dialog }}
-      open={props.isOpen}
-      TransitionComponent={Transition}
-      onClose={props.onCancel}
-      aria-labelledby="form-dialog-title"
-    >
-      <DialogTitle id="form-dialog-title">Open a registration</DialogTitle>
-      <DialogContent>
-        <DateTimePicker
-          label="Start date"
-          inputVariant="outlined"
-          value={startDate}
-          onChange={setStartDate}
-          format="DD/MM/yyyy HH:mm"
-          disablePast
-          className={classes.formElement}
-          required
-        />
-        <DateTimePicker
-          label="End date"
-          inputVariant="outlined"
-          value={endDate}
-          onChange={setEndDate}
-          format="DD/MM/yyyy HH:mm"
-          disablePast
-          className={classes.formElement}
-          required
-        />
-        <DialogContentText style={{ marginBottom: 0 }}>
-          Apply to course
-        </DialogContentText>
-        <FormGroup>
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={isAllCoursesApplied}
-                onChange={handleApplyToAllCourses}
-                name="allCourses"
-              />
-            }
-            label="All courses"
-          />
-        </FormGroup>
-        <Typography
-          style={{ fontSize: 10, marginBottom: "1rem" }}
-          color="secondary"
-        >
-          * Every course can register to this registration
-        </Typography>
-        {!isAllCoursesApplied ? (
-          <React.Fragment>
-            <Grid container spacing={1}>
-              <Grid item xs={11}>
-                <TextField
-                  id="courseId"
-                  required
-                  label="Course ID"
-                  variant="outlined"
-                  className={classes.formElement}
-                  value={courseToAdd}
-                  onChange={(e) => setCourseToAdd(e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={1}>
-                <IconButton
-                  style={{ borderRadius: 8, fontWeight: 700, height: "80%" }}
-                  color="primary"
-                  onClick={handleAddCourse}
-                >
-                  +
-                </IconButton>
-              </Grid>
-            </Grid>
-            <div className={classes.appliedCourses}>
-              {appliedCourses.map((course) => (
-                <Chip
-                  key={course}
-                  label={course}
-                  onDelete={() => handleDeleteCourse(course)}
-                  color="primary"
-                  style={{ marginRight: "0.5rem", marginTop: "0.5rem" }}
-                />
-              ))}
-            </div>
-          </React.Fragment>
-        ) : null}
-      </DialogContent>
-      <DialogActions style={{ padding: "16px 24px" }}>
-        <Button onClick={props.onCancel} color="primary">
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disableElevation
-          style={{ borderRadius: 8, fontWeight: 700 }}
-          onClick={props.onSubmit}
-          color="primary"
-        >
-          Submit
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
-};
+  const handleClose = useCallback(() => {
+    dispatch(openRegistrationRefreshed());
+  }, [dispatch]);
 
-RegistrationDialog.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  isOpen: PropTypes.bool.isRequired,
+  return (
+    <React.Fragment>
+      <CustomizedSnackbar
+        open={openRegistrationStatus === "failed" ? true : false}
+        onClose={() => handleClose()}
+        message={openRegistrationError}
+        severity="error"
+      />
+      <CustomizedSnackbar
+        open={openRegistrationStatus === "succeeded" ? true : false}
+        onClose={() => handleClose()}
+        message={"Open registration successfully"}
+        severity="success"
+      />
+      <Dialog
+        classes={{ paper: classes.dialog }}
+        open={props.isOpen}
+        TransitionComponent={Transition}
+        onClose={props.onCancel}
+        aria-labelledby="form-dialog-title"
+      >
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <DialogTitle id="form-dialog-title">Open a registration</DialogTitle>
+          <DialogContent>
+            <DateTimePicker
+              id="startDate"
+              name="startDate"
+              label="Start date"
+              inputVariant="outlined"
+              format="DD/MM/yyyy HH:mm"
+              disablePast
+              className={classes.formElement}
+              inputRef={register({ required: true })}
+            />
+            <DateTimePicker
+              id="endDate"
+              name="endDate"
+              label="End date"
+              inputVariant="outlined"
+              format="DD/MM/yyyy HH:mm"
+              disablePast
+              className={classes.formElement}
+              inputRef={register({ required: true })}
+            />
+            <DialogContentText style={{ marginBottom: 0 }}>
+              Apply to course
+            </DialogContentText>
+            <Controller
+              name="allCourses"
+              control={control}
+              defaultValue={true}
+              rules={{ required: true }}
+              render={(props) => (
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={props.value}
+                      onChange={(e) => {
+                        props.onChange(e.target.checked);
+                        setIsAllCoursesApplied(e.target.checked);
+                      }}
+                      name="allCourses"
+                    />
+                  }
+                  label="All courses"
+                />
+              )}
+            />
+            <Typography
+              style={{ fontSize: 10, marginBottom: "1rem" }}
+              color="secondary"
+            ></Typography>
+            {!isAllCoursesApplied ? (
+              <div
+                style={{
+                  border: "2px solid #1A73E8",
+                  borderRadius: 7,
+                  padding: "0.5rem",
+                }}
+              >
+                <TextField
+                  id="searchCourse"
+                  name="searchCourse"
+                  autoComplete="off"
+                  label="Search course"
+                  variant="outlined"
+                  value={courseToSearch}
+                  onChange={(e) => setCourseToSearch(e.target.value)}
+                  className={classes.formElement}
+                />
+                <CheckboxList />
+              </div>
+            ) : null}
+          </DialogContent>
+          <DialogActions style={{ padding: "16px 24px" }}>
+            <Button onClick={props.onCancel} color="primary">
+              Cancel
+            </Button>
+            <div style={{ position: "relative" }}>
+              <Button
+                variant="contained"
+                disableElevation
+                style={{ borderRadius: 8, fontWeight: 700 }}
+                color="primary"
+                type="submit"
+                disabled={openRegistrationStatus === "loading"}
+              >
+                Submit
+              </Button>
+              {openRegistrationStatus === "loading" && (
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </div>
+          </DialogActions>
+        </form>
+      </Dialog>
+    </React.Fragment>
+  );
 };
 
 export default RegistrationDialog;

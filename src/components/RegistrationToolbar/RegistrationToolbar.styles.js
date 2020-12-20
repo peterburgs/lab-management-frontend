@@ -1,11 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles(() => ({
-  semester: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "center",
-  },
+export default makeStyles({
   paper: {
     padding: "0.5rem",
     borderRadius: 8,
@@ -17,7 +12,4 @@ export default makeStyles(() => ({
     borderRadius: 8,
     textTransform: "none",
   },
-  dialog: {
-    borderRadius: 16,
-  },
-}));
+});

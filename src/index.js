@@ -12,8 +12,8 @@ import { Provider } from "react-redux";
 
 ReactDOM.render(
   <Provider store={store}>
-    <BrowserRouter>
-      <React.StrictMode>
+    <React.StrictMode>
+      <BrowserRouter>
         <Hidden xsUp xsDown implementation="js">
           <img src={errorImg} alt="Error" />
         </Hidden>
@@ -164,8 +164,8 @@ ReactDOM.render(
         >
           <App />
         </ErrorBoundary>
-      </React.StrictMode>
-    </BrowserRouter>
+      </BrowserRouter>
+    </React.StrictMode>
   </Provider>,
   document.getElementById("root")
 );
