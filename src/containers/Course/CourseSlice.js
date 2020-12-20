@@ -2,46 +2,14 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/index";
 
 const initialState = {
-  courses: [
-    {
-      id: 123,
-      name: "Intro to programming",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 124,
-      name: "Intro to IT",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 125,
-      name: "Database System",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 126,
-      name: "Database Management System",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 127,
-      name: "Programming Technique",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-    {
-      id: 128,
-      name: "Networking Essentials",
-      credit: 3,
-      createdAt: "11/12/2020 7:00 AM",
-    },
-  ],
+  courses: [],
   addCourseStatus: "idle",
   addCourseError: null,
+  updateCourseStatus: "idle",
+  updateCourseError: null,
+  fetchCourseStatus: "idle",
+  fetchCourseError: null,
+  course: null,
 };
 
 export const addCourse = createAsyncThunk(
@@ -53,6 +21,50 @@ export const addCourse = createAsyncThunk(
     } catch (err) {
       console.log(err);
       return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const updateCourse = createAsyncThunk(
+  "courses/updateCourse",
+  async (course, { rejectWithValue }) => {
+    console.log(course);
+    try {
+      const res = await api.put(
+        `/courses/${course.courseId}`,
+        course
+      );
+      return res.data;
+    } catch (err) {
+      console.log(err.message);
+      rejectWithValue(err.message);
+    }
+  }
+);
+
+export const fetchCourse = createAsyncThunk(
+  "courses/fetchCourse",
+  async (_, { rejectWithValue }) => {
+    try {
+      const res = await api.get("/courses");
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const getCourseById = createAsyncThunk(
+  "courses/getCourseById",
+  async ({ courseId }, { rejectWithValue }) => {
+    try {
+      const res = await api.get(`/courses/${courseId}`);
+      console.log(res);
+
+      return res.data;
+    } catch (err) {
+      console.log(err.message);
     }
   }
 );
@@ -77,6 +89,36 @@ const coursesSlice = createSlice({
     [addCourse.failed]: (state, action) => {
       state.addCourseStatus = "failed";
       state.addCourseError = action.payload;
+    },
+    [updateCourse.fulfilled]: (state, action) => {
+      state.updateCourseStatus = "succeeded";
+      console.log(action.payload);
+      let oldCourse = state.courses.find(
+        (c) => c._id === action.payload.course._id
+      );
+      oldCourse = action.payload.course;
+    },
+    [updateCourse.pending]: (state, action) => {
+      state.updateCourseStatus = "loading";
+    },
+    [updateCourse.failed]: (state, action) => {
+      state.updateCourseStatus = "failed";
+      state.updateCourseError = action.payload;
+    },
+    [getCourseById.fulfilled]: (state, action) => {
+      state.course = action.payload.course;
+    },
+    //
+    [fetchCourse.fulfilled]: (state, action) => {
+      state.courses = action.payload.courses;
+      state.fetchCourseStatus = "succeeded";
+    },
+    [fetchCourse.pending]: (state, action) => {
+      state.fetchCourseStatus = "loading";
+    },
+    [fetchCourse.failed]: (state, action) => {
+      state.fetchCourseStatus = "failed";
+      state.fetchCourseError = action.payload;
     },
   },
 });

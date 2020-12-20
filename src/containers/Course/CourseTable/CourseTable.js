@@ -50,11 +50,11 @@ const CourseTable = (props) => {
       label: "ID",
     },
     {
-      id: "name",
+      id: "courseName",
       label: "Name",
     },
     {
-      id: "credit",
+      id: "numberOfCredits",
       isNumber: true,
       label: "Credit",
     },
@@ -148,19 +148,34 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.courses, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                {stableSort(
+                  props.courses,
+                  getComparator(order, orderBy)
+                )
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   .map((row, index) => (
-                    <StyledTableRow key={row.id} className={classes.row}>
+                    <StyledTableRow
+                      key={row.id}
+                      className={classes.row}
+                    >
                       <TableCell component="th" scope="row">
-                        {index + 1}
+                        {rowsPerPage * page + index + 1}
                       </TableCell>
-                      <TableCell align="left">{row.id}</TableCell>
+                      <TableCell align="left">{row._id}</TableCell>
                       <TableCell align="left">
-                        <Link to="/courses/id">{row.name}</Link>
+                        <Link to={`/courses/${row._id}`}>
+                          {row.courseName}
+                        </Link>
                       </TableCell>
-                      <TableCell align="center">{row.credit}</TableCell>
-                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="center">
+                        {row.numberOfCredits}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.createdAt}
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton
                           onClick={handleOpenActionMenu}
