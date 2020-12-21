@@ -12,7 +12,7 @@ const CustomizedSnackbars = (props) => {
     <Snackbar
       style={{ zIndex: 1301 }}
       open={props.open}
-      autoHideDuration={3000}
+      autoHideDuration={1000}
       onClose={props.onClose}
     >
       <Alert onClose={props.onClose} severity={props.severity}>

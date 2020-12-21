@@ -1,47 +1,50 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Route, useHistory, useRouteMatch } from "react-router-dom";
 import useStyles from "./Course.styles";
-import { Grid, Paper, IconButton, InputBase } from "@material-ui/core";
+import {
+  Grid,
+  Paper,
+  IconButton,
+  InputBase,
+} from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import CourseTable from "./CourseTable/CourseTable";
 import CourseDialog from "./CourseDialog/CourseDialog";
 import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchCourse,
+  setCurrentCourseId,
+  search,
+} from "./CourseSlice";
+import produce from "immer";
+import { unwrapResult } from "@reduxjs/toolkit";
 
 const Course = () => {
   const classes = useStyles();
   const [openedCourseDialog, setOpenedCourseDialog] = useState(false);
-  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
-  const history = useHistory();
-  const match = useRouteMatch();
+  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(
+    false
+  );
+
+  const dispatch = useDispatch();
 
   // Application state
   const courses = useSelector((state) => state.courses.courses);
+  const searchResult = useSelector(
+    (state) => state.courses.searchResult
+  );
+  const currentCourseId = useSelector(
+    (state) => state.courses.currentCourseId
+  );
 
   // handle "New course" button click
   const handleNewCourseButtonClick = () => {
     setOpenedCourseDialog(true);
   };
 
-  // handle submit button click in course dialog
-  const handleCourseDialogSubmitButtonClick = () => {
-    setOpenedCourseDialog(false);
-  };
-
-  // handle cancel button click in course dialog
-  const handleCourseDialogCancelButtonClick = () => {
-    history.replace("/courses");
-    if (openedCourseDialog) {
-      setOpenedCourseDialog(false);
-    }
-  };
-
   const handleDeleteClick = () => {
     setOpenedConfirmDialog(true);
-  };
-
-  const handleEditClick = () => {
-    history.replace("/courses/id");
   };
 
   // handle submit button click in confirm dialog
@@ -54,19 +57,34 @@ const Course = () => {
     setOpenedConfirmDialog(false);
   };
 
+  const handleSearch = (e) => {
+    const text = e.target.value;
+    dispatch(search(text));
+  };
+
+  useEffect(async () => {
+    try {
+      const dispatchState = await dispatch(fetchCourse());
+      unwrapResult(dispatchState);
+    } catch (err) {
+      console.log(err);
+    }
+  }, []);
+
   return (
     <div className={classes.course}>
-      <Route path={match.path + "/id"}>
-        <CourseDialog
-          isOpen={true}
-          onCancel={handleCourseDialogCancelButtonClick}
-          onSubmit={handleCourseDialogSubmitButtonClick}
-        />
-      </Route>
       <CourseDialog
-        isOpen={openedCourseDialog}
-        onCancel={handleCourseDialogCancelButtonClick}
-        onSubmit={handleCourseDialogSubmitButtonClick}
+        isOpen={currentCourseId ? true : openedCourseDialog}
+        onCancel={() => {
+          currentCourseId
+            ? dispatch(setCurrentCourseId(null))
+            : setOpenedCourseDialog(false);
+        }}
+        onFinish={() => {
+          currentCourseId
+            ? dispatch(setCurrentCourseId(null))
+            : setOpenedCourseDialog(false);
+        }}
       />
       <ConfirmDialog
         isOpen={openedConfirmDialog}
@@ -85,18 +103,23 @@ const Course = () => {
               <SearchIcon />
             </IconButton>
             <InputBase
+              onChange={handleSearch}
               className={classes.input}
               placeholder="Enter course ID or course name"
-              inputProps={{ "aria-label": "enter course id or course name" }}
+              inputProps={{
+                "aria-label": "enter course id or course name",
+              }}
             />
           </Paper>
         </Grid>
         <Grid style={{ marginTop: 24 }} item xs={11}>
           <CourseTable
             onDeleteClick={handleDeleteClick}
-            onEditClick={handleEditClick}
             onAddCourse={handleNewCourseButtonClick}
-            courses={courses}
+            onEdit={() => {
+              setOpenedCourseDialog(true);
+            }}
+            courses={searchResult}
           />
         </Grid>
       </Grid>

@@ -12,7 +12,7 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { setCurrentCourseId } from "../CourseSlice";
 import useStyles from "./CourseTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PropTypes from "prop-types";
@@ -21,6 +21,7 @@ import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTab
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import AddIcon from "@material-ui/icons/Add";
+import { useDispatch } from "react-redux";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -32,6 +33,8 @@ const StyledTableRow = withStyles(() => ({
 
 const CourseTable = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
@@ -50,11 +53,11 @@ const CourseTable = (props) => {
       label: "ID",
     },
     {
-      id: "name",
+      id: "courseName",
       label: "Name",
     },
     {
-      id: "credit",
+      id: "numberOfCredits",
       isNumber: true,
       label: "Credit",
     },
@@ -148,19 +151,42 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.courses, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                {stableSort(
+                  props.courses,
+                  getComparator(order, orderBy)
+                )
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   .map((row, index) => (
-                    <StyledTableRow key={row.id} className={classes.row}>
+                    <StyledTableRow
+                      key={row.id}
+                      className={classes.row}
+                    >
                       <TableCell component="th" scope="row">
-                        {index + 1}
+                        {rowsPerPage * page + index + 1}
                       </TableCell>
-                      <TableCell align="left">{row.id}</TableCell>
+                      <TableCell align="left">{row._id}</TableCell>
                       <TableCell align="left">
-                        <Link to="/courses/id">{row.name}</Link>
+                        <Button
+                          style={{
+                            color: "#d7385e",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() =>
+                            dispatch(setCurrentCourseId(row._id))
+                          }
+                        >
+                          {row.courseName}
+                        </Button>
                       </TableCell>
-                      <TableCell align="center">{row.credit}</TableCell>
-                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="center">
+                        {row.numberOfCredits}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.createdAt}
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton
                           onClick={handleOpenActionMenu}
@@ -185,7 +211,7 @@ const CourseTable = (props) => {
                         >
                           <MenuItem
                             onClick={() => {
-                              props.onEditClick();
+                              dispatch(setCurrentCourseId(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
