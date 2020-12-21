@@ -29,12 +29,8 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const useAddCourse = () => {
   const dispatch = useDispatch();
 
-  const addCourseStatus = useSelector(
-    (state) => state.courses.addCourseStatus
-  );
-  const addCourseError = useSelector(
-    (state) => state.courses.addCourseError
-  );
+  const addCourseStatus = useSelector((state) => state.courses.addCourseStatus);
+  const addCourseError = useSelector((state) => state.courses.addCourseError);
 
   const handleAddCourse = useCallback(
     async (course) => {
@@ -79,18 +75,8 @@ const useUpdateCourse = () => {
 const CourseDialog = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const {
-    register,
-    handleSubmit,
-    errors,
-    control,
-    setValue,
-  } = useForm();
-  const [
-    addCourseStatus,
-    addCourseError,
-    handleAddCourse,
-  ] = useAddCourse();
+  const { register, handleSubmit, errors, control, setValue } = useForm();
+  const [addCourseStatus, addCourseError, handleAddCourse] = useAddCourse();
 
   const [
     updateCourseStatus,
@@ -98,22 +84,19 @@ const CourseDialog = (props) => {
     handleUpdateCourse,
   ] = useUpdateCourse();
 
-  const currentCourseId = useSelector(
-    (state) => state.courses.currentCourseId
-  );
+  const currentCourseId = useSelector((state) => state.courses.currentCourseId);
 
-  useEffect(async () => {
+  useEffect(() => {
     if (currentCourseId) {
-      const result = await dispatch(getCourseById(currentCourseId));
-      unwrapResult(result);
-      setValue("courseName", result.payload.course.courseName);
-      setValue("courseId", result.payload.course._id);
-      setValue(
-        "numberOfCredits",
-        result.payload.course.numberOfCredits
-      );
+      (async () => {
+        const result = await dispatch(getCourseById(currentCourseId));
+        unwrapResult(result);
+        setValue("courseName", result.payload.course.courseName);
+        setValue("courseId", result.payload.course._id);
+        setValue("numberOfCredits", result.payload.course.numberOfCredits);
+      })();
     }
-  }, [dispatch, currentCourseId]);
+  }, [dispatch, currentCourseId, setValue]);
 
   const onSubmit = async (data) => {
     if (currentCourseId) {
@@ -136,8 +119,7 @@ const CourseDialog = (props) => {
     <React.Fragment>
       <CustomizedSnackbar
         open={
-          addCourseStatus === "failed" ||
-          updateCourseStatus === "failed"
+          addCourseStatus === "failed" || updateCourseStatus === "failed"
             ? true
             : false
         }
@@ -147,8 +129,7 @@ const CourseDialog = (props) => {
       />
       <CustomizedSnackbar
         open={
-          addCourseStatus === "succeeded" ||
-          updateCourseStatus === "succeeded"
+          addCourseStatus === "succeeded" || updateCourseStatus === "succeeded"
             ? true
             : false
         }
@@ -179,9 +160,7 @@ const CourseDialog = (props) => {
               autoFocus={currentCourseId ? true : false}
               className={classes.formElement}
               error={Boolean(errors.courseName)}
-              helperText={
-                errors.courseName ? "*This field is required" : null
-              }
+              helperText={errors.courseName ? "*This field is required" : null}
             />
 
             <TextField
@@ -194,9 +173,7 @@ const CourseDialog = (props) => {
               defaultValue={currentCourseId ? " " : ""}
               className={classes.formElement}
               error={Boolean(errors.courseName)}
-              helperText={
-                errors.courseName ? "*This field is required" : null
-              }
+              helperText={errors.courseName ? "*This field is required" : null}
             />
             <TextField
               id="numberOfCredits"
@@ -210,9 +187,7 @@ const CourseDialog = (props) => {
               className={classes.formElement}
               error={Boolean(errors.numberOfCredits)}
               helperText={
-                errors.numberOfCredits
-                  ? "*This field is required"
-                  : null
+                errors.numberOfCredits ? "*This field is required" : null
               }
             />
           </DialogContent>
