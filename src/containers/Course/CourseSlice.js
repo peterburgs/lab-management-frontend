@@ -116,7 +116,7 @@ const coursesSlice = createSlice({
     [addCourse.pending]: (state, action) => {
       state.addCourseStatus = "loading";
     },
-    [addCourse.failed]: (state, action) => {
+    [addCourse.rejected]: (state, action) => {
       state.addCourseStatus = "failed";
       state.addCourseError = action.payload;
     },
@@ -129,7 +129,7 @@ const coursesSlice = createSlice({
     [deleteCourse.pending]: (state, action) => {
       state.deleteCourseStatus = "loading";
     },
-    [deleteCourse.failed]: (state, action) => {
+    [deleteCourse.rejected]: (state, action) => {
       state.deleteCourseStatus = "failed";
       state.deleteCourseError = action.payload;
     },
@@ -150,7 +150,7 @@ const coursesSlice = createSlice({
     [updateCourse.pending]: (state, action) => {
       state.updateCourseStatus = "loading";
     },
-    [updateCourse.failed]: (state, action) => {
+    [updateCourse.rejected]: (state, action) => {
       state.updateCourseStatus = "failed";
       state.updateCourseError = action.payload;
     },
@@ -166,7 +166,7 @@ const coursesSlice = createSlice({
     [fetchCourse.pending]: (state, action) => {
       state.fetchCourseStatus = "loading";
     },
-    [fetchCourse.failed]: (state, action) => {
+    [fetchCourse.rejected]: (state, action) => {
       state.fetchCourseStatus = "failed";
       state.fetchCourseError = action.payload;
     },
