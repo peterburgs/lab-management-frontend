@@ -5,11 +5,15 @@ const initialState = {
   courses: [],
   addCourseStatus: "idle",
   addCourseError: null,
+  deleteCourseStatus: "idle",
+  deleteCourseError: null,
   updateCourseStatus: "idle",
   updateCourseError: null,
   fetchCourseStatus: "idle",
   fetchCourseError: null,
   course: null,
+  currentCourseId: null,
+  searchResult: [],
 };
 
 export const addCourse = createAsyncThunk(
@@ -42,6 +46,19 @@ export const updateCourse = createAsyncThunk(
   }
 );
 
+export const deleteCourse = createAsyncThunk(
+  "courses/deleteCourse",
+  async (courseId, { rejectWithValue }) => {
+    try {
+      const res = await api.delete(`/courses/${courseId}`);
+      return res.data;
+    } catch (err) {
+      console.log(err.message);
+      rejectWithValue(err.message);
+    }
+  }
+);
+
 export const fetchCourse = createAsyncThunk(
   "courses/fetchCourse",
   async (_, { rejectWithValue }) => {
@@ -57,11 +74,9 @@ export const fetchCourse = createAsyncThunk(
 
 export const getCourseById = createAsyncThunk(
   "courses/getCourseById",
-  async ({ courseId }, { rejectWithValue }) => {
+  async (courseId, { rejectWithValue }) => {
     try {
       const res = await api.get(`/courses/${courseId}`);
-      console.log(res);
-
       return res.data;
     } catch (err) {
       console.log(err.message);
@@ -77,6 +92,21 @@ const coursesSlice = createSlice({
       state.addCourseError = null;
       state.addCourseStatus = "idle";
     },
+    updateCourseRefreshed(state) {
+      state.updateCourseError = null;
+      state.updateCourseStatus = "idle";
+    },
+    setCurrentCourseId(state, action) {
+      state.currentCourseId = action.payload;
+    },
+    search(state, action) {
+      console.log(action.payload);
+      state.searchResult = state.courses.filter((c) =>
+        c.courseName
+          .toLowerCase()
+          .includes(String(action.payload).toLowerCase())
+      );
+    },
   },
   extraReducers: {
     [addCourse.fulfilled]: (state, action) => {
@@ -90,13 +120,32 @@ const coursesSlice = createSlice({
       state.addCourseStatus = "failed";
       state.addCourseError = action.payload;
     },
+    [deleteCourse.fulfilled]: (state, action) => {
+      state.courses = state.courses.filter(
+        (c) => c._id !== action.payload
+      );
+      state.deleteCourseStatus = "succeeded";
+    },
+    [deleteCourse.pending]: (state, action) => {
+      state.deleteCourseStatus = "loading";
+    },
+    [deleteCourse.failed]: (state, action) => {
+      state.deleteCourseStatus = "failed";
+      state.deleteCourseError = action.payload;
+    },
     [updateCourse.fulfilled]: (state, action) => {
       state.updateCourseStatus = "succeeded";
       console.log(action.payload);
-      let oldCourse = state.courses.find(
+      let index1 = state.courses.findIndex(
         (c) => c._id === action.payload.course._id
       );
-      oldCourse = action.payload.course;
+      let index2 = state.searchResult.findIndex(
+        (c) => c._id === action.payload.course._id
+      );
+      if (index1 !== -1 && index2 !== -1) {
+        state.courses[index1] = { ...action.payload.course };
+        state.searchResult[index2] = { ...action.payload.course };
+      }
     },
     [updateCourse.pending]: (state, action) => {
       state.updateCourseStatus = "loading";
@@ -111,6 +160,7 @@ const coursesSlice = createSlice({
     //
     [fetchCourse.fulfilled]: (state, action) => {
       state.courses = action.payload.courses;
+      state.searchResult = action.payload.courses;
       state.fetchCourseStatus = "succeeded";
     },
     [fetchCourse.pending]: (state, action) => {
@@ -123,6 +173,11 @@ const coursesSlice = createSlice({
   },
 });
 
-export const { addCourseRefreshed } = coursesSlice.actions;
+export const {
+  addCourseRefreshed,
+  updateCourseRefreshed,
+  setCurrentCourseId,
+  search,
+} = coursesSlice.actions;
 
 export default coursesSlice.reducer;

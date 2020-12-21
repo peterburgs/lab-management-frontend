@@ -9,19 +9,18 @@ import {
   Slide,
 } from "@material-ui/core";
 import useStyles from "./CourseDialog.styles";
-import PropTypes from "prop-types";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, batch } from "react-redux";
 import {
   addCourse,
   addCourseRefreshed,
   updateCourse,
+  updateCourseRefreshed,
+  getCourseById,
 } from "../CourseSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import CustomizedSnackbar from "../../../components/CustomizedSnackbar/CustomizedSnackbar";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import CircularProgress from "@material-ui/core/CircularProgress";
-import { useRouteMatch } from "react-router-dom";
-import { getCourseById } from "../CourseSlice";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -65,8 +64,8 @@ const useUpdateCourse = () => {
   const handleUpdateCourse = useCallback(
     async (course) => {
       try {
-        const res = await dispatch(updateCourse(course));
-        unwrapResult(res);
+        const updateCourseRes = await dispatch(updateCourse(course));
+        unwrapResult(updateCourseRes);
       } catch (err) {
         console.log(err);
       }
@@ -99,24 +98,25 @@ const CourseDialog = (props) => {
     handleUpdateCourse,
   ] = useUpdateCourse();
 
-  const match = useRouteMatch();
+  const currentCourseId = useSelector(
+    (state) => state.courses.currentCourseId
+  );
 
   useEffect(async () => {
-    if (props.isEdit) {
-      const result = await dispatch(getCourseById(match.params));
+    if (currentCourseId) {
+      const result = await dispatch(getCourseById(currentCourseId));
       unwrapResult(result);
-      console.log(result);
       setValue("courseName", result.payload.course.courseName);
       setValue("courseId", result.payload.course._id);
       setValue(
-        "numberOfCredit",
-        result.payload.course.numberOfCredit
+        "numberOfCredits",
+        result.payload.course.numberOfCredits
       );
     }
-  }, [dispatch, props.isEdit]);
+  }, [dispatch, currentCourseId]);
 
   const onSubmit = async (data) => {
-    if (props.isEdit) {
+    if (currentCourseId) {
       await handleUpdateCourse(data);
       props.onFinish();
     } else {
@@ -126,7 +126,10 @@ const CourseDialog = (props) => {
   };
 
   const handleClose = useCallback(() => {
-    dispatch(addCourseRefreshed());
+    batch(() => {
+      dispatch(updateCourseRefreshed());
+      dispatch(addCourseRefreshed());
+    });
   }, [dispatch]);
 
   return (
@@ -138,7 +141,7 @@ const CourseDialog = (props) => {
             ? true
             : false
         }
-        onClose={() => handleClose(props.isEdit)}
+        onClose={() => handleClose()}
         message={addCourseError}
         severity="error"
       />
@@ -149,12 +152,8 @@ const CourseDialog = (props) => {
             ? true
             : false
         }
-        onClose={() => handleClose(props.isEdit)}
-        message={
-          props.isEdit
-            ? "Update course successfully"
-            : "Add course successfully"
-        }
+        onClose={() => handleClose()}
+        message={"Successfully"}
         severity="success"
       />
       <Dialog
@@ -166,7 +165,7 @@ const CourseDialog = (props) => {
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle id="form-dialog-title">
-            {props.isEdit ? "Edit course" : "Add a course"}
+            {currentCourseId ? "Edit course" : "Add new course"}
           </DialogTitle>
           <DialogContent>
             <TextField
@@ -176,8 +175,8 @@ const CourseDialog = (props) => {
               inputRef={register({ required: true })}
               label="Course ID"
               variant="outlined"
-              defaultValue={props.isEdit ? " " : ""}
-              autoFocus={props.isEdit ? true : false}
+              defaultValue={currentCourseId ? " " : ""}
+              autoFocus={currentCourseId ? true : false}
               className={classes.formElement}
               error={Boolean(errors.courseName)}
               helperText={
@@ -192,7 +191,7 @@ const CourseDialog = (props) => {
               inputRef={register({ required: true })}
               label="Course name"
               variant="outlined"
-              defaultValue={props.isEdit ? " " : ""}
+              defaultValue={currentCourseId ? " " : ""}
               className={classes.formElement}
               error={Boolean(errors.courseName)}
               helperText={
@@ -200,18 +199,18 @@ const CourseDialog = (props) => {
               }
             />
             <TextField
-              id="numberOfCredit"
-              name="numberOfCredit"
+              id="numberOfCredits"
+              name="numberOfCredits"
               type="number"
               autoComplete="off"
               inputRef={register({ required: true })}
               label="Credits"
               variant="outlined"
-              defaultValue={props.isEdit ? 0 : null}
+              defaultValue={currentCourseId ? 0 : null}
               className={classes.formElement}
-              error={Boolean(errors.numberOfCredit)}
+              error={Boolean(errors.numberOfCredits)}
               helperText={
-                errors.numberOfCredit
+                errors.numberOfCredits
                   ? "*This field is required"
                   : null
               }
@@ -228,7 +227,10 @@ const CourseDialog = (props) => {
                 style={{ borderRadius: 8, fontWeight: 700 }}
                 color="primary"
                 type="submit"
-                disabled={addCourseStatus === "loading"}
+                disabled={
+                  addCourseStatus === "loading" ||
+                  updateCourseStatus === "loading"
+                }
               >
                 Submit
               </Button>
@@ -245,13 +247,6 @@ const CourseDialog = (props) => {
       </Dialog>
     </React.Fragment>
   );
-};
-
-CourseDialog.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  isOpen: PropTypes.bool.isRequired,
-  isEdit: PropTypes.bool.isRequired,
 };
 
 export default CourseDialog;

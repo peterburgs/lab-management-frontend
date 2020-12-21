@@ -12,7 +12,7 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
+import { setCurrentCourseId } from "../CourseSlice";
 import useStyles from "./CourseTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import PropTypes from "prop-types";
@@ -21,6 +21,7 @@ import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTab
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import AddIcon from "@material-ui/icons/Add";
+import { useDispatch } from "react-redux";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -32,6 +33,8 @@ const StyledTableRow = withStyles(() => ({
 
 const CourseTable = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
@@ -166,9 +169,17 @@ const CourseTable = (props) => {
                       </TableCell>
                       <TableCell align="left">{row._id}</TableCell>
                       <TableCell align="left">
-                        <Link to={`/courses/${row._id}`}>
+                        <Button
+                          style={{
+                            color: "#d7385e",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() =>
+                            dispatch(setCurrentCourseId(row._id))
+                          }
+                        >
                           {row.courseName}
-                        </Link>
+                        </Button>
                       </TableCell>
                       <TableCell align="center">
                         {row.numberOfCredits}
@@ -200,7 +211,7 @@ const CourseTable = (props) => {
                         >
                           <MenuItem
                             onClick={() => {
-                              props.onEditClick();
+                              dispatch(setCurrentCourseId(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
