@@ -11,4 +11,9 @@ export default makeStyles({
     justifyContent: "center",
     alignItems: "center",
   },
+  semester: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+  },
 });

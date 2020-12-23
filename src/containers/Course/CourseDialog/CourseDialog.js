@@ -159,8 +159,8 @@ const CourseDialog = (props) => {
               defaultValue={currentCourseId ? " " : ""}
               autoFocus={currentCourseId ? true : false}
               className={classes.formElement}
-              error={Boolean(errors.courseName)}
-              helperText={errors.courseName ? "*This field is required" : null}
+              error={Boolean(errors.courseId)}
+              helperText={errors.courseId ? "*This field is required" : null}
             />
 
             <TextField
