@@ -12,15 +12,15 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import useStyles from "./LaboratoryTable.styles";
+import { setLabIdToEdit, setLabIdToDelete } from "../LabSlice";
+import useStyles from "./LabTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import AddIcon from "@material-ui/icons/Add";
+import { useDispatch } from "react-redux";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -30,15 +30,16 @@ const StyledTableRow = withStyles(() => ({
   },
 }))(TableRow);
 
-const LaboratoryTable = (props) => {
+const LabTable = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
+  const [orderBy, setOrderBy] = useState("labName");
 
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
-  const openActionMenu = Boolean(actionMenuAnchorEl);
 
   const headCells = [
     {
@@ -46,8 +47,8 @@ const LaboratoryTable = (props) => {
       label: "#",
     },
     {
-      id: "name",
-      label: "name",
+      id: "labName",
+      label: "Name",
     },
     {
       id: "capacity",
@@ -106,8 +107,7 @@ const LaboratoryTable = (props) => {
   };
 
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, props.labs.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, props.labs.length - page * rowsPerPage);
 
   // handle open menu context when clicking account icon
   const handleOpenActionMenu = (event) => {
@@ -115,14 +115,14 @@ const LaboratoryTable = (props) => {
   };
 
   // handle close menu context when clicking account icon
-  const handleActionMenuClose = () => {
+  const handleCloseActionMenu = () => {
     setActionMenuAnchorEl(null);
   };
 
   return (
     <div className={classes.labTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Laboratories"}>
+        <EnhancedToolbar title={"Labs"}>
           <Button
             className={classes.button}
             variant="contained"
@@ -130,7 +130,7 @@ const LaboratoryTable = (props) => {
             startIcon={<AddIcon />}
             onClick={props.onAddLab}
           >
-            New lab
+            New Lab
           </Button>
         </EnhancedToolbar>
         <TableContainer>
@@ -147,24 +147,35 @@ const LaboratoryTable = (props) => {
                 {stableSort(props.labs, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
-                    <StyledTableRow key={row.id} className={classes.row}>
+                    <StyledTableRow key={row._id} className={classes.row}>
                       <TableCell component="th" scope="row">
-                        {index + 1}
+                        {rowsPerPage * page + index + 1}
                       </TableCell>
                       <TableCell align="left">
-                        <Link to="/laboratories/id">{row.name}</Link>
+                        <Button
+                          style={{
+                            color: "#d7385e",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => {
+                            dispatch(setLabIdToEdit(row._id));
+                            console.log(row);
+                          }}
+                        >
+                          {row.labName}
+                        </Button>
                       </TableCell>
                       <TableCell align="center">{row.capacity}</TableCell>
                       <TableCell align="left">{row.createdAt}</TableCell>
                       <TableCell align="center">
                         <IconButton
+                          id={`${row._id}-menu`} // <-- Magic code
                           onClick={handleOpenActionMenu}
                           style={{ padding: 0 }}
                         >
                           <MoreVertIcon />
                         </IconButton>
                         <Menu
-                          id="menu-appbar"
                           anchorEl={actionMenuAnchorEl}
                           anchorOrigin={{
                             vertical: "top",
@@ -175,12 +186,16 @@ const LaboratoryTable = (props) => {
                             vertical: "top",
                             horizontal: "right",
                           }}
-                          open={openActionMenu}
-                          onClose={handleActionMenuClose}
+                          open={
+                            actionMenuAnchorEl
+                              ? actionMenuAnchorEl.id === `${row._id}-menu`
+                              : false
+                          } // <-- Magic code
+                          onClose={handleCloseActionMenu}
                         >
                           <MenuItem
                             onClick={() => {
-                              props.onEditClick();
+                              dispatch(setLabIdToEdit(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -188,7 +203,7 @@ const LaboratoryTable = (props) => {
                           </MenuItem>
                           <MenuItem
                             onClick={() => {
-                              props.onDeleteClick();
+                              dispatch(setLabIdToDelete(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -221,11 +236,4 @@ const LaboratoryTable = (props) => {
   );
 };
 
-LaboratoryTable.propTypes = {
-  labs: PropTypes.array.isRequired,
-  onAddLab: PropTypes.func.isRequired,
-  onEditClick: PropTypes.func.isRequired,
-  onDeleteClick: PropTypes.func.isRequired,
-};
-
-export default LaboratoryTable;
+export default LabTable;

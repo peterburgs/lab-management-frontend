@@ -16,8 +16,8 @@ export default makeStyles(() => ({
     marginLeft: "0.5rem",
   },
   row: {
-    '& td': {
+    "& td": {
       fontSize: 13,
-    }
-  }
+    },
+  },
 }));

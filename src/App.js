@@ -13,7 +13,7 @@ import "fontsource-roboto";
 import Schedule from "./containers/Schedule/Schedule";
 import Registration from "./containers/Registration/Registration";
 import Course from "./containers/Course/Course";
-import Laboratory from "./containers/Laboratory/Laboratory";
+import Lab from "./containers/Lab/Lab";
 import Request from "./containers/Request/Request";
 import Lecturer from "./containers/Lecturer/Lecturer";
 import ContentContainer from "./hoc/ContentContainer/ContentContainer";
@@ -81,10 +81,10 @@ function App() {
             </ContentContainer>
           </Layout>
         </Route>
-        <Route path="/laboratories">
+        <Route path="/labs">
           <Layout>
             <ContentContainer>
-              <Laboratory />
+              <Lab />
             </ContentContainer>
           </Layout>
         </Route>

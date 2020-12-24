@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { Route, useHistory, useRouteMatch } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
 import useStyles from "./Course.styles";
 import {
   Grid,
   Paper,
   IconButton,
   InputBase,
+  Snackbar,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import CourseTable from "./CourseTable/CourseTable";
@@ -14,115 +14,185 @@ import ConfirmDialog from "../../components/ConfirmDialog/ConfirmDialog";
 import { useSelector, useDispatch } from "react-redux";
 import {
   fetchCourse,
-  setCurrentCourseId,
+  setCourseIdToEdit,
+  setCourseIdToDelete,
   search,
+  fetchCourseRefreshed,
+  deleteCourse,
+  deleteCourseRefreshed,
 } from "./CourseSlice";
-import produce from "immer";
 import { unwrapResult } from "@reduxjs/toolkit";
+import Spinner from "../../components/Spinner/Spinner";
+import RefreshIcon from "@material-ui/icons/Refresh";
+
+const useFetchCourse = () => {
+  const dispatch = useDispatch();
+
+  const fetchCourseStatus = useSelector(
+    (state) => state.courses.fetchCourseStatus
+  );
+  const fetchCourseError = useSelector(
+    (state) => state.courses.fetchCourseError
+  );
+
+  useEffect(() => {
+    if (fetchCourseStatus === "idle") {
+      (async () => {
+        try {
+          const fetchCourseResult = await dispatch(fetchCourse());
+          unwrapResult(fetchCourseResult);
+        } catch (err) {
+          console.log(err);
+        }
+      })();
+    }
+    return () => {
+      if (fetchCourseStatus === "failed" || fetchCourseStatus === "succeeded") {
+        dispatch(fetchCourseRefreshed());
+      }
+    };
+  }, [dispatch, fetchCourseStatus]);
+
+  return [fetchCourseStatus, fetchCourseError];
+};
+
+const useDeleteCourse = () => {
+  const dispatch = useDispatch();
+
+  const deleteCourseStatus = useSelector(
+    (state) => state.courses.deleteCourseStatus
+  );
+  const deleteCourseError = useSelector(
+    (state) => state.courses.deleteCourseError
+  );
+
+  const handleDeleteCourse = useCallback(
+    async (courseId) => {
+      try {
+        const deleteCourseRes = await dispatch(deleteCourse(courseId));
+        unwrapResult(deleteCourseRes);
+      } catch (err) {
+        console.log(err);
+      }
+    },
+    [dispatch]
+  );
+
+  return [deleteCourseStatus, deleteCourseError, handleDeleteCourse];
+};
 
 const Course = () => {
   const classes = useStyles();
-  const [openedCourseDialog, setOpenedCourseDialog] = useState(false);
-  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(
-    false
-  );
-
   const dispatch = useDispatch();
+  const [openedCourseDialog, setOpenedCourseDialog] = useState(false);
 
   // Application state
-  const courses = useSelector((state) => state.courses.courses);
-  const searchResult = useSelector(
-    (state) => state.courses.searchResult
+  const searchResult = useSelector((state) => state.courses.searchResult);
+  const courseIdToDelete = useSelector(
+    (state) => state.courses.courseIdToDelete
   );
-  const currentCourseId = useSelector(
-    (state) => state.courses.currentCourseId
-  );
+  const courseIdToEdit = useSelector((state) => state.courses.courseIdToEdit);
 
-  // handle "New course" button click
-  const handleNewCourseButtonClick = () => {
-    setOpenedCourseDialog(true);
-  };
+  // Fetch course state
+  const [fetchCourseStatus, fetchCourseError] = useFetchCourse();
 
-  const handleDeleteClick = () => {
-    setOpenedConfirmDialog(true);
-  };
-
-  // handle submit button click in confirm dialog
-  const handleConfirmDialogSubmitButtonClick = () => {
-    setOpenedConfirmDialog(false);
-  };
-
-  // handle cancel button click in confirm dialog
-  const handleConfirmDialogCancelButtonClick = () => {
-    setOpenedConfirmDialog(false);
-  };
+  // Delete course state
+  const [
+    deleteCourseStatus,
+    deleteCourseError,
+    handleDeleteCourse,
+  ] = useDeleteCourse();
 
   const handleSearch = (e) => {
-    const text = e.target.value;
-    dispatch(search(text));
+    dispatch(search(e.target.value));
   };
 
-  useEffect(async () => {
-    try {
-      const dispatchState = await dispatch(fetchCourse());
-      unwrapResult(dispatchState);
-    } catch (err) {
-      console.log(err);
-    }
-  }, []);
+  const handleDelete = async () => {
+    await handleDeleteCourse(courseIdToDelete);
+    dispatch(setCourseIdToDelete(null));
+  };
 
   return (
     <div className={classes.course}>
+      <Snackbar
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "center",
+        }}
+        open={fetchCourseStatus === "failed" ? true : false}
+        autoHideDuration={6000}
+        message={fetchCourseError}
+        action={
+          <React.Fragment>
+            <IconButton
+              size="small"
+              aria-label="close"
+              color="inherit"
+              onClick={() => dispatch(fetchCourseRefreshed())}
+            >
+              <RefreshIcon fontSize="small" />
+            </IconButton>
+          </React.Fragment>
+        }
+      />
       <CourseDialog
-        isOpen={currentCourseId ? true : openedCourseDialog}
+        isOpen={courseIdToEdit ? true : openedCourseDialog}
         onCancel={() => {
-          currentCourseId
-            ? dispatch(setCurrentCourseId(null))
+          courseIdToEdit
+            ? dispatch(setCourseIdToEdit(null))
             : setOpenedCourseDialog(false);
         }}
         onFinish={() => {
-          currentCourseId
-            ? dispatch(setCurrentCourseId(null))
+          courseIdToEdit
+            ? dispatch(setCourseIdToEdit(null))
             : setOpenedCourseDialog(false);
         }}
       />
       <ConfirmDialog
-        isOpen={openedConfirmDialog}
-        onCancel={handleConfirmDialogCancelButtonClick}
-        onSubmit={handleConfirmDialogSubmitButtonClick}
+        isOpen={Boolean(courseIdToDelete)}
+        onCancel={() => dispatch(setCourseIdToDelete(null))}
+        onSubmit={handleDelete}
+        onLoading={deleteCourseStatus === "loading"}
+        onClose={() => dispatch(deleteCourseRefreshed())}
+        error={deleteCourseError}
+        success={
+          deleteCourseStatus === "succeeded"
+            ? "Delete course successfully"
+            : null
+        }
         title="Do you want to delete the course?"
       />
-      <Grid container justify="center">
-        <Grid item xs={11}>
-          <Paper component="form" className={classes.paper}>
-            <IconButton
-              type="submit"
-              className={classes.iconButton}
-              aria-label="search"
-            >
-              <SearchIcon />
-            </IconButton>
-            <InputBase
-              onChange={handleSearch}
-              className={classes.input}
-              placeholder="Enter course ID or course name"
-              inputProps={{
-                "aria-label": "enter course id or course name",
-              }}
+      {fetchCourseStatus === "loading" || fetchCourseStatus === "failed" ? (
+        <Spinner />
+      ) : (
+        <Grid container justify="center">
+          <Grid item xs={11}>
+            <Paper component="form" className={classes.paper}>
+              <IconButton
+                type="submit"
+                className={classes.iconButton}
+                aria-label="search"
+              >
+                <SearchIcon />
+              </IconButton>
+              <InputBase
+                onChange={handleSearch}
+                className={classes.input}
+                placeholder="Enter course name"
+                inputProps={{
+                  "aria-label": "enter course name",
+                }}
+              />
+            </Paper>
+          </Grid>
+          <Grid style={{ marginTop: 24 }} item xs={11}>
+            <CourseTable
+              onAddCourse={() => setOpenedCourseDialog(true)}
+              courses={searchResult}
             />
-          </Paper>
+          </Grid>
         </Grid>
-        <Grid style={{ marginTop: 24 }} item xs={11}>
-          <CourseTable
-            onDeleteClick={handleDeleteClick}
-            onAddCourse={handleNewCourseButtonClick}
-            onEdit={() => {
-              setOpenedCourseDialog(true);
-            }}
-            courses={searchResult}
-          />
-        </Grid>
-      </Grid>
+      )}
     </div>
   );
 };

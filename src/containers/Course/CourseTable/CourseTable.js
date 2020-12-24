@@ -12,10 +12,9 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { setCurrentCourseId } from "../CourseSlice";
+import { setCourseIdToEdit, setCourseIdToDelete } from "../CourseSlice";
 import useStyles from "./CourseTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
@@ -38,10 +37,9 @@ const CourseTable = (props) => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
+  const [orderBy, setOrderBy] = useState("courseName");
 
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
-  const openActionMenu = Boolean(actionMenuAnchorEl);
 
   const headCells = [
     {
@@ -49,7 +47,7 @@ const CourseTable = (props) => {
       label: "#",
     },
     {
-      id: "id",
+      id: "_id",
       label: "ID",
     },
     {
@@ -122,7 +120,7 @@ const CourseTable = (props) => {
   };
 
   // handle close menu context when clicking account icon
-  const handleActionMenuClose = () => {
+  const handleCloseActionMenu = () => {
     setActionMenuAnchorEl(null);
   };
 
@@ -151,19 +149,10 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(
-                  props.courses,
-                  getComparator(order, orderBy)
-                )
-                  .slice(
-                    page * rowsPerPage,
-                    page * rowsPerPage + rowsPerPage
-                  )
+                {stableSort(props.courses, getComparator(order, orderBy))
+                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
-                    <StyledTableRow
-                      key={row.id}
-                      className={classes.row}
-                    >
+                    <StyledTableRow key={row._id} className={classes.row}>
                       <TableCell component="th" scope="row">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
@@ -174,9 +163,10 @@ const CourseTable = (props) => {
                             color: "#d7385e",
                             fontWeight: "bold",
                           }}
-                          onClick={() =>
-                            dispatch(setCurrentCourseId(row._id))
-                          }
+                          onClick={() => {
+                            dispatch(setCourseIdToEdit(row._id));
+                            console.log(row);
+                          }}
                         >
                           {row.courseName}
                         </Button>
@@ -184,18 +174,16 @@ const CourseTable = (props) => {
                       <TableCell align="center">
                         {row.numberOfCredits}
                       </TableCell>
-                      <TableCell align="left">
-                        {row.createdAt}
-                      </TableCell>
+                      <TableCell align="left">{row.createdAt}</TableCell>
                       <TableCell align="center">
                         <IconButton
+                          id={`${row._id}-menu`} // <-- Magic code
                           onClick={handleOpenActionMenu}
                           style={{ padding: 0 }}
                         >
                           <MoreVertIcon />
                         </IconButton>
                         <Menu
-                          id="menu-appbar"
                           anchorEl={actionMenuAnchorEl}
                           anchorOrigin={{
                             vertical: "top",
@@ -206,12 +194,16 @@ const CourseTable = (props) => {
                             vertical: "top",
                             horizontal: "right",
                           }}
-                          open={openActionMenu}
-                          onClose={handleActionMenuClose}
+                          open={
+                            actionMenuAnchorEl
+                              ? actionMenuAnchorEl.id === `${row._id}-menu`
+                              : false
+                          } // <-- Magic code
+                          onClose={handleCloseActionMenu}
                         >
                           <MenuItem
                             onClick={() => {
-                              dispatch(setCurrentCourseId(row._id));
+                              dispatch(setCourseIdToEdit(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -219,7 +211,7 @@ const CourseTable = (props) => {
                           </MenuItem>
                           <MenuItem
                             onClick={() => {
-                              props.onDeleteClick();
+                              dispatch(setCourseIdToDelete(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -250,13 +242,6 @@ const CourseTable = (props) => {
       </Paper>
     </div>
   );
-};
-
-CourseTable.propTypes = {
-  courses: PropTypes.array.isRequired,
-  onAddCourse: PropTypes.func.isRequired,
-  onEditClick: PropTypes.func.isRequired,
-  onDeleteClick: PropTypes.func.isRequired,
 };
 
 export default CourseTable;

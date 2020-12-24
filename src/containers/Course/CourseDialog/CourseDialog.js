@@ -75,7 +75,7 @@ const useUpdateCourse = () => {
 const CourseDialog = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
-  const { register, handleSubmit, errors, control, setValue } = useForm();
+  const { register, handleSubmit, errors, setValue } = useForm();
   const [addCourseStatus, addCourseError, handleAddCourse] = useAddCourse();
 
   const [
@@ -84,22 +84,22 @@ const CourseDialog = (props) => {
     handleUpdateCourse,
   ] = useUpdateCourse();
 
-  const currentCourseId = useSelector((state) => state.courses.currentCourseId);
+  const courseIdToEdit = useSelector((state) => state.courses.courseIdToEdit);
 
   useEffect(() => {
-    if (currentCourseId) {
+    if (courseIdToEdit) {
       (async () => {
-        const result = await dispatch(getCourseById(currentCourseId));
+        const result = await dispatch(getCourseById(courseIdToEdit));
         unwrapResult(result);
         setValue("courseName", result.payload.course.courseName);
         setValue("courseId", result.payload.course._id);
         setValue("numberOfCredits", result.payload.course.numberOfCredits);
       })();
     }
-  }, [dispatch, currentCourseId, setValue]);
+  }, [dispatch, courseIdToEdit, setValue]);
 
   const onSubmit = async (data) => {
-    if (currentCourseId) {
+    if (courseIdToEdit) {
       await handleUpdateCourse(data);
       props.onFinish();
     } else {
@@ -124,7 +124,9 @@ const CourseDialog = (props) => {
             : false
         }
         onClose={() => handleClose()}
-        message={addCourseError}
+        message={
+          addCourseStatus === "failed" ? addCourseError : updateCourseError
+        }
         severity="error"
       />
       <CustomizedSnackbar
@@ -134,7 +136,11 @@ const CourseDialog = (props) => {
             : false
         }
         onClose={() => handleClose()}
-        message={"Successfully"}
+        message={
+          addCourseStatus === "succeeded"
+            ? "Add new course successfully"
+            : "Update course successfully"
+        }
         severity="success"
       />
       <Dialog
@@ -146,7 +152,7 @@ const CourseDialog = (props) => {
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle id="form-dialog-title">
-            {currentCourseId ? "Edit course" : "Add new course"}
+            {courseIdToEdit ? "Edit course" : "Add new course"}
           </DialogTitle>
           <DialogContent>
             <TextField
@@ -156,8 +162,9 @@ const CourseDialog = (props) => {
               inputRef={register({ required: true })}
               label="Course ID"
               variant="outlined"
-              defaultValue={currentCourseId ? " " : ""}
-              autoFocus={currentCourseId ? true : false}
+              disabled={courseIdToEdit ? true : false}
+              defaultValue={courseIdToEdit ? " " : ""}
+              autoFocus={courseIdToEdit ? true : false}
               className={classes.formElement}
               error={Boolean(errors.courseId)}
               helperText={errors.courseId ? "*This field is required" : null}
@@ -170,7 +177,7 @@ const CourseDialog = (props) => {
               inputRef={register({ required: true })}
               label="Course name"
               variant="outlined"
-              defaultValue={currentCourseId ? " " : ""}
+              defaultValue={courseIdToEdit ? " " : ""}
               className={classes.formElement}
               error={Boolean(errors.courseName)}
               helperText={errors.courseName ? "*This field is required" : null}
@@ -183,7 +190,7 @@ const CourseDialog = (props) => {
               inputRef={register({ required: true })}
               label="Credits"
               variant="outlined"
-              defaultValue={currentCourseId ? 0 : null}
+              defaultValue={courseIdToEdit ? 0 : null}
               className={classes.formElement}
               error={Boolean(errors.numberOfCredits)}
               helperText={

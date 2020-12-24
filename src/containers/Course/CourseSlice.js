@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/index";
+import _ from "lodash";
 
 const initialState = {
   courses: [],
@@ -12,7 +13,8 @@ const initialState = {
   fetchCourseStatus: "idle",
   fetchCourseError: null,
   course: null,
-  currentCourseId: null,
+  courseIdToEdit: null,
+  courseIdToDelete: null,
   searchResult: [],
 };
 
@@ -20,7 +22,8 @@ export const addCourse = createAsyncThunk(
   "courses/addCourse",
   async (course, { rejectWithValue }) => {
     try {
-      const response = await api.post("/courses", course);
+      const data = { ...course, isRemoved: false };
+      const response = await api.post("/courses", data);
       return response.data;
     } catch (err) {
       console.log(err);
@@ -31,17 +34,17 @@ export const addCourse = createAsyncThunk(
 
 export const updateCourse = createAsyncThunk(
   "courses/updateCourse",
-  async (course, { rejectWithValue }) => {
+  async (course, { rejectWithValue, getState }) => {
     console.log(course);
     try {
       const res = await api.put(
-        `/courses/${course.courseId}`,
+        `/courses/${getState().courses.courseIdToEdit}`,
         course
       );
       return res.data;
     } catch (err) {
       console.log(err.message);
-      rejectWithValue(err.message);
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -54,7 +57,7 @@ export const deleteCourse = createAsyncThunk(
       return res.data;
     } catch (err) {
       console.log(err.message);
-      rejectWithValue(err.message);
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -80,6 +83,7 @@ export const getCourseById = createAsyncThunk(
       return res.data;
     } catch (err) {
       console.log(err.message);
+      return rejectWithValue(err.message);
     }
   }
 );
@@ -96,8 +100,19 @@ const coursesSlice = createSlice({
       state.updateCourseError = null;
       state.updateCourseStatus = "idle";
     },
-    setCurrentCourseId(state, action) {
-      state.currentCourseId = action.payload;
+    deleteCourseRefreshed(state) {
+      state.deleteCourseError = null;
+      state.deleteCourseStatus = "idle";
+    },
+    fetchCourseRefreshed(state) {
+      state.fetchCourseStatus = "idle";
+      state.fetchCourseError = null;
+    },
+    setCourseIdToEdit(state, action) {
+      state.courseIdToEdit = action.payload;
+    },
+    setCourseIdToDelete(state, action) {
+      state.courseIdToDelete = action.payload;
     },
     search(state, action) {
       console.log(action.payload);
@@ -109,8 +124,10 @@ const coursesSlice = createSlice({
     },
   },
   extraReducers: {
+    // Add course reducers
     [addCourse.fulfilled]: (state, action) => {
-      state.courses.push(action.payload);
+      state.courses.push(action.payload.course);
+      state.searchResult = _.cloneDeep(state.courses);
       state.addCourseStatus = "succeeded";
     },
     [addCourse.pending]: (state, action) => {
@@ -120,9 +137,13 @@ const coursesSlice = createSlice({
       state.addCourseStatus = "failed";
       state.addCourseError = action.payload;
     },
+    // Delete course reducers
     [deleteCourse.fulfilled]: (state, action) => {
       state.courses = state.courses.filter(
-        (c) => c._id !== action.payload
+        (c) => c._id !== action.payload.course._id
+      );
+      state.searchResult = state.searchResult.filter(
+        (c) => c._id !== action.payload.course._id
       );
       state.deleteCourseStatus = "succeeded";
     },
@@ -133,6 +154,7 @@ const coursesSlice = createSlice({
       state.deleteCourseStatus = "failed";
       state.deleteCourseError = action.payload;
     },
+    // Update course reducers
     [updateCourse.fulfilled]: (state, action) => {
       state.updateCourseStatus = "succeeded";
       console.log(action.payload);
@@ -143,8 +165,8 @@ const coursesSlice = createSlice({
         (c) => c._id === action.payload.course._id
       );
       if (index1 !== -1 && index2 !== -1) {
-        state.courses[index1] = { ...action.payload.course };
-        state.searchResult[index2] = { ...action.payload.course };
+        state.courses[index1] = _.cloneDeep(action.payload.course);
+        state.searchResult[index2] = _.cloneDeep(action.payload.course);
       }
     },
     [updateCourse.pending]: (state, action) => {
@@ -157,7 +179,7 @@ const coursesSlice = createSlice({
     [getCourseById.fulfilled]: (state, action) => {
       state.course = action.payload.course;
     },
-    //
+    // fetch course reducers
     [fetchCourse.fulfilled]: (state, action) => {
       state.courses = action.payload.courses;
       state.searchResult = action.payload.courses;
@@ -176,7 +198,10 @@ const coursesSlice = createSlice({
 export const {
   addCourseRefreshed,
   updateCourseRefreshed,
-  setCurrentCourseId,
+  setCourseIdToEdit,
+  setCourseIdToDelete,
+  fetchCourseRefreshed,
+  deleteCourseRefreshed,
   search,
 } = coursesSlice.actions;
 
