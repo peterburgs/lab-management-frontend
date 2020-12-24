@@ -7,7 +7,8 @@ import {
   Slide,
 } from "@material-ui/core";
 import useStyles from "./ConfirmDialog.styles";
-import PropTypes from "prop-types";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import CustomizedSnackbar from "../CustomizedSnackbar/CustomizedSnackbar";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -17,37 +18,50 @@ const ConfirmDialog = (props) => {
   const classes = useStyles();
 
   return (
-    <Dialog
-      classes={{ paper: classes.dialog }}
-      open={props.isOpen}
-      TransitionComponent={Transition}
-      onClose={props.onCancel}
-      aria-labelledby="confirm-dialog-title"
-    >
-      <DialogTitle id="confirm-dialog-title">{props.title}</DialogTitle>
-      <DialogActions style={{ padding: "16px 24px" }}>
-        <Button onClick={props.onCancel} color="primary">
-          Cancel
-        </Button>
-        <Button
-          variant="contained"
-          disableElevation
-          style={{ borderRadius: 8 }}
-          onClick={props.onSubmit}
-          color="secondary"
-        >
-          Submit
-        </Button>
-      </DialogActions>
-    </Dialog>
+    <React.Fragment>
+      <CustomizedSnackbar
+        open={Boolean(props.error)}
+        onClose={props.onClose}
+        message={props.error}
+        severity="error"
+      />
+      <CustomizedSnackbar
+        open={Boolean(props.success)}
+        onClose={props.onClose}
+        message={props.success}
+        severity="success"
+      />
+      <Dialog
+        classes={{ paper: classes.dialog }}
+        open={props.isOpen}
+        TransitionComponent={Transition}
+        onClose={props.onCancel}
+        aria-labelledby="confirm-dialog-title"
+      >
+        <DialogTitle id="confirm-dialog-title">{props.title}</DialogTitle>
+        <DialogActions style={{ padding: "16px 24px" }}>
+          <Button onClick={props.onCancel} color="primary">
+            Cancel
+          </Button>
+          <div style={{ position: "relative" }}>
+            <Button
+              variant="contained"
+              disableElevation
+              style={{ borderRadius: 8, fontWeight: 700 }}
+              color="primary"
+              onClick={props.onSubmit}
+              disabled={props.onLoading}
+            >
+              Submit
+            </Button>
+            {props.onLoading && (
+              <CircularProgress size={24} className={classes.buttonProgress} />
+            )}
+          </div>
+        </DialogActions>
+      </Dialog>
+    </React.Fragment>
   );
-};
-
-ConfirmDialog.propTypes = {
-  onCancel: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  isOpen: PropTypes.bool.isRequired,
-  title: PropTypes.string.isRequired,
 };
 
 export default ConfirmDialog;
