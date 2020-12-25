@@ -44,13 +44,15 @@ function App() {
 
   let routes = (
     <Switch>
-      <Route path="/" exact>
-        <ResolveAuth />
-      </Route>
+      {localStorage.getItem("token") ? (
+        <Route path="/">
+          <ResolveAuth />
+        </Route>
+      ) : null}
       <Route path="/signin">
         <Auth />
       </Route>
-      <Redirect to="/" />
+      <Redirect to="/signin" />
     </Switch>
   );
 

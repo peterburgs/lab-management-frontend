@@ -32,17 +32,14 @@ const useAddCourse = () => {
   const addCourseStatus = useSelector((state) => state.courses.addCourseStatus);
   const addCourseError = useSelector((state) => state.courses.addCourseError);
 
-  const handleAddCourse = useCallback(
-    async (course) => {
-      try {
-        const res = await dispatch(addCourse(course));
-        unwrapResult(res);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleAddCourse = async (course) => {
+    try {
+      const res = await dispatch(addCourse(course));
+      unwrapResult(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [addCourseStatus, addCourseError, handleAddCourse];
 };
@@ -57,17 +54,14 @@ const useUpdateCourse = () => {
     (state) => state.courses.updateCourseError
   );
 
-  const handleUpdateCourse = useCallback(
-    async (course) => {
-      try {
-        const updateCourseRes = await dispatch(updateCourse(course));
-        unwrapResult(updateCourseRes);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleUpdateCourse = async (course) => {
+    try {
+      const updateCourseRes = await dispatch(updateCourse(course));
+      unwrapResult(updateCourseRes);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [updateCourseStatus, updateCourseError, handleUpdateCourse];
 };

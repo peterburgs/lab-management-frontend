@@ -1,7 +1,6 @@
 import React from "react";
 import Snackbar from "@material-ui/core/Snackbar";
 import MuiAlert from "@material-ui/lab/Alert";
-import PropTypes from "prop-types";
 
 const Alert = (props) => {
   return <MuiAlert elevation={6} variant="filled" {...props} />;
@@ -20,13 +19,6 @@ const CustomizedSnackbars = (props) => {
       </Alert>
     </Snackbar>
   );
-};
-
-CustomizedSnackbars.propTypes = {
-  open: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  severity: PropTypes.string,
-  message: PropTypes.string,
 };
 
 export default CustomizedSnackbars;

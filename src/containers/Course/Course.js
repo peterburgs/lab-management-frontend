@@ -66,17 +66,14 @@ const useDeleteCourse = () => {
     (state) => state.courses.deleteCourseError
   );
 
-  const handleDeleteCourse = useCallback(
-    async (courseId) => {
-      try {
-        const deleteCourseRes = await dispatch(deleteCourse(courseId));
-        unwrapResult(deleteCourseRes);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleDeleteCourse = async (courseId) => {
+    try {
+      const deleteCourseRes = await dispatch(deleteCourse(courseId));
+      unwrapResult(deleteCourseRes);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [deleteCourseStatus, deleteCourseError, handleDeleteCourse];
 };
@@ -107,10 +104,10 @@ const Course = () => {
     dispatch(search(e.target.value));
   };
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     await handleDeleteCourse(courseIdToDelete);
     dispatch(setCourseIdToDelete(null));
-  };
+  }, [handleDeleteCourse, dispatch, courseIdToDelete]);
 
   return (
     <div className={classes.course}>

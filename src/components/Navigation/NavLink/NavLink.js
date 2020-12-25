@@ -1,5 +1,3 @@
-/* eslint-disable no-unused-vars */
-/* eslint-disable react/prop-types */
 import React from "react";
 import { Route, NavLink as RouterLink, withRouter } from "react-router-dom";
 
@@ -12,7 +10,6 @@ const Link = ({
   history,
   ...rest
 }) => {
-  /* eslint-disable react/jsx-no-bind */
   return (
     <Route
       render={() => (

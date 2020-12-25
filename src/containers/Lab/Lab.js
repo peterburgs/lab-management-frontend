@@ -58,17 +58,14 @@ const useDeleteLab = () => {
   const deleteLabStatus = useSelector((state) => state.labs.deleteLabStatus);
   const deleteLabError = useSelector((state) => state.labs.deleteLabError);
 
-  const handleDeleteLab = useCallback(
-    async (labId) => {
-      try {
-        const deleteLabRes = await dispatch(deleteLab(labId));
-        unwrapResult(deleteLabRes);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleDeleteLab = async (labId) => {
+    try {
+      const deleteLabRes = await dispatch(deleteLab(labId));
+      unwrapResult(deleteLabRes);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [deleteLabStatus, deleteLabError, handleDeleteLab];
 };
@@ -93,10 +90,10 @@ const Lab = () => {
     dispatch(search(e.target.value));
   };
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     await handleDeleteLab(labIdToDelete);
     dispatch(setLabIdToDelete(null));
-  };
+  }, [handleDeleteLab, dispatch, labIdToDelete]);
 
   return (
     <div className={classes.Lab}>

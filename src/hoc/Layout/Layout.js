@@ -14,7 +14,6 @@ import MenuIcon from "@material-ui/icons/Menu";
 import clsx from "clsx";
 import ElevationScroll from "../../components/ElevationScroll/ElevationScroll";
 import NotificationsIcon from "@material-ui/icons/Notifications";
-import PropTypes from "prop-types";
 import { useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -40,12 +39,12 @@ const Layout = (props) => {
   // handle close side bar when mobile size
   const handleCloseMobileSidebar = useCallback(() => {
     setOpenedMobileSideBar(false);
-  });
+  }, []);
 
   // handle open side bar when mobile size
   const handleOpenMobileSidebar = useCallback(() => {
     setOpenedMobileSideBar(true);
-  });
+  }, []);
 
   // handle open menu context when clicking account icon
   const handleAccountMenu = (event) => {
@@ -109,7 +108,7 @@ const Layout = (props) => {
               >
                 <img
                   style={{ width: 25, height: 25, borderRadius: 16 }}
-                  alt="account-image"
+                  alt="account"
                   src={imageUrl}
                 />
               </IconButton>
@@ -137,10 +136,6 @@ const Layout = (props) => {
       <main className={classes.content}>{props.children}</main>
     </React.Fragment>
   );
-};
-
-Layout.propTypes = {
-  children: PropTypes.object.isRequired,
 };
 
 export default Layout;

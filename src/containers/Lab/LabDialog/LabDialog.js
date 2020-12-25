@@ -32,17 +32,14 @@ const useAddLab = () => {
   const addLabStatus = useSelector((state) => state.labs.addLabStatus);
   const addLabError = useSelector((state) => state.labs.addLabError);
 
-  const handleAddLab = useCallback(
-    async (lab) => {
-      try {
-        const res = await dispatch(addLab(lab));
-        unwrapResult(res);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleAddLab = async (lab) => {
+    try {
+      const res = await dispatch(addLab(lab));
+      unwrapResult(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [addLabStatus, addLabError, handleAddLab];
 };
@@ -50,24 +47,17 @@ const useAddLab = () => {
 const useUpdateLab = () => {
   const dispatch = useDispatch();
 
-  const updateLabStatus = useSelector(
-    (state) => state.labs.updateLabStatus
-  );
-  const updateLabError = useSelector(
-    (state) => state.labs.updateLabError
-  );
+  const updateLabStatus = useSelector((state) => state.labs.updateLabStatus);
+  const updateLabError = useSelector((state) => state.labs.updateLabError);
 
-  const handleUpdateLab = useCallback(
-    async (lab) => {
-      try {
-        const updateLabRes = await dispatch(updateLab(lab));
-        unwrapResult(updateLabRes);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleUpdateLab = async (lab) => {
+    try {
+      const updateLabRes = await dispatch(updateLab(lab));
+      unwrapResult(updateLabRes);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [updateLabStatus, updateLabError, handleUpdateLab];
 };
@@ -78,11 +68,7 @@ const LabDialog = (props) => {
   const { register, handleSubmit, errors, setValue } = useForm();
   const [addLabStatus, addLabError, handleAddLab] = useAddLab();
 
-  const [
-    updateLabStatus,
-    updateLabError,
-    handleUpdateLab,
-  ] = useUpdateLab();
+  const [updateLabStatus, updateLabError, handleUpdateLab] = useUpdateLab();
 
   const labIdToEdit = useSelector((state) => state.labs.labIdToEdit);
 
@@ -123,9 +109,7 @@ const LabDialog = (props) => {
             : false
         }
         onClose={() => handleClose()}
-        message={
-          addLabStatus === "failed" ? addLabError : updateLabError
-        }
+        message={addLabStatus === "failed" ? addLabError : updateLabError}
         severity="error"
       />
       <CustomizedSnackbar
@@ -194,8 +178,7 @@ const LabDialog = (props) => {
                 color="primary"
                 type="submit"
                 disabled={
-                  addLabStatus === "loading" ||
-                  updateLabStatus === "loading"
+                  addLabStatus === "loading" || updateLabStatus === "loading"
                 }
               >
                 Submit

@@ -8,6 +8,7 @@ import {
   TableRow,
   TablePagination,
   Button,
+  Typography,
 } from "@material-ui/core";
 import useStyles from "./RegistrationTable.styles";
 import PropTypes from "prop-types";
@@ -107,7 +108,38 @@ const RegistrationTable = (props) => {
   return (
     <div className={classes.registrationTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Registration"}>
+        <EnhancedToolbar
+          title={
+            <div style={{ display: "flex" }}>
+              <Typography variant="h6">{props.title}</Typography>
+              {props.isOpening ? (
+                <Typography
+                  style={{
+                    marginLeft: "0.5rem",
+                    color: "white",
+                    background: "green",
+                    padding: "0.1rem 0.5rem",
+                    borderRadius: 5,
+                  }}
+                >
+                  OPENING
+                </Typography>
+              ) : (
+                <Typography
+                  style={{
+                    marginLeft: "0.5rem",
+                    color: "white",
+                    background: "red",
+                    padding: "0.1rem 0.5rem",
+                    borderRadius: 5,
+                  }}
+                >
+                  CLOSED
+                </Typography>
+              )}
+            </div>
+          }
+        >
           <Button
             className={classes.button}
             variant="contained"

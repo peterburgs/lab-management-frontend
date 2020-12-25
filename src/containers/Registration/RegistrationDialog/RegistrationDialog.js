@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -11,13 +11,11 @@ import {
   FormControlLabel,
   Checkbox,
   Typography,
-  Grid,
   IconButton,
-  Chip,
+  Grid,
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
 import useStyles from "./RegistrationDialog.styles";
-import produce from "immer";
 import { useForm, Controller } from "react-hook-form";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import CustomizedSnackbar from "../../../components/CustomizedSnackbar/CustomizedSnackbar";
@@ -28,6 +26,8 @@ import {
   openRegistrationRefreshed,
 } from "../RegistrationSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
+import { fetchCourse, fetchCourseRefreshed } from "../../Course/CourseSlice";
+import SearchIcon from "@material-ui/icons/Search";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -44,17 +44,14 @@ const useOpenRegistration = () => {
     (state) => state.registration.openRegistrationError
   );
 
-  const handleOpenRegistration = useCallback(
-    async (registration) => {
-      try {
-        const res = await dispatch(openRegistration(registration));
-        unwrapResult(res);
-      } catch (err) {
-        console.log(err);
-      }
-    },
-    [dispatch]
-  );
+  const handleOpenRegistration = async (registration) => {
+    try {
+      const res = await dispatch(openRegistration(registration));
+      unwrapResult(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return [
     openRegistrationStatus,
@@ -63,11 +60,42 @@ const useOpenRegistration = () => {
   ];
 };
 
+const useFetchCourse = () => {
+  const dispatch = useDispatch();
+
+  const fetchCourseStatus = useSelector(
+    (state) => state.courses.fetchCourseStatus
+  );
+  const fetchCourseError = useSelector(
+    (state) => state.courses.fetchCourseError
+  );
+
+  useEffect(() => {
+    if (fetchCourseStatus === "idle") {
+      (async () => {
+        try {
+          const fetchCourseResult = await dispatch(fetchCourse());
+          unwrapResult(fetchCourseResult);
+        } catch (err) {
+          console.log(err);
+        }
+      })();
+    }
+    return () => {
+      if (fetchCourseStatus === "failed" || fetchCourseStatus === "succeeded") {
+        dispatch(fetchCourseRefreshed());
+      }
+    };
+  }, [dispatch, fetchCourseStatus]);
+
+  return [fetchCourseStatus, fetchCourseError];
+};
+
 const RegistrationDialog = (props) => {
   const classes = useStyles();
 
   const dispatch = useDispatch();
-  const { register, handleSubmit, errors, control } = useForm();
+  const { handleSubmit, control } = useForm();
   const [
     openRegistrationStatus,
     openRegistrationError,
@@ -75,30 +103,90 @@ const RegistrationDialog = (props) => {
   ] = useOpenRegistration();
 
   const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(true);
-  const [courses, setCourses] = useState([]);
   const [courseToSearch, setCourseToSearch] = useState("");
-  const [searchCourseResult, setSearchCourseResult] = useState([]);
+  const [fetchCourseStatus, fetchCourseError] = useFetchCourse();
 
-  const handleDeleteCourse = (course) => {
-    setCourses((courses) => {
-      return courses.filter((c) => c !== course);
-    });
-  };
+  // Application state
+  const courses = useSelector((state) => state.courses.courses);
 
-  const onSubmit = (data) => {
-    console.log(data);
+  const [coursesToSelect, setCoursesToSelect] = useState([]);
+
+  useEffect(() => {
+    setCoursesToSelect(
+      courses.map((course) => {
+        return { id: course._id, name: course.courseName };
+      })
+    );
+  }, [courses]);
+
+  const onSubmit = async (data) => {
+    let registration = null;
+    if (isAllCoursesApplied) {
+      registration = {
+        ...data,
+        registrableCourses: courses.map((course) => course._id),
+      };
+    } else {
+      registration = {
+        ...data,
+        registrableCourses: selectedCourses.map((course) => course._id),
+      };
+    }
+    await handleOpenRegistration(registration);
+    props.onFinish();
   };
 
   const handleClose = useCallback(() => {
     dispatch(openRegistrationRefreshed());
   }, [dispatch]);
 
+  const [selectedCourses, setSelectedCourses] = useState([]);
+
+  const handleSelectCourse = (value) => () => {
+    const currentIndex = selectedCourses.findIndex(
+      (course) => course.id === value.id
+    );
+    const newSelectedCourses = [...selectedCourses];
+
+    if (currentIndex === -1) {
+      newSelectedCourses.push(value);
+    } else {
+      newSelectedCourses.splice(currentIndex, 1);
+    }
+
+    setSelectedCourses(newSelectedCourses);
+  };
+
+  const handleSearchCourse = () => {
+    if (courseToSearch) {
+      setCoursesToSelect(
+        courses
+          .filter((c) => c._id === courseToSearch)
+          .map((course) => {
+            return { id: course._id, name: course.courseName };
+          })
+      );
+    } else {
+      setCoursesToSelect(
+        courses.map((course) => {
+          return { id: course._id, name: course.courseName };
+        })
+      );
+    }
+  };
+
   return (
     <React.Fragment>
       <CustomizedSnackbar
-        open={openRegistrationStatus === "failed" ? true : false}
+        open={
+          openRegistrationStatus === "failed" || fetchCourseError === "failed"
+            ? true
+            : false
+        }
         onClose={() => handleClose()}
-        message={openRegistrationError}
+        message={
+          openRegistrationError ? openRegistrationError : fetchCourseError
+        }
         severity="error"
       />
       <CustomizedSnackbar
@@ -117,49 +205,52 @@ const RegistrationDialog = (props) => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle id="form-dialog-title">Open a registration</DialogTitle>
           <DialogContent>
-            <DateTimePicker
-              id="startDate"
+            <Controller
               name="startDate"
-              label="Start date"
-              inputVariant="outlined"
-              format="DD/MM/yyyy HH:mm"
-              disablePast
-              className={classes.formElement}
-              inputRef={register({ required: true })}
+              control={control}
+              defaultValue={new Date()}
+              rules={{ required: true }}
+              render={(props) => (
+                <DateTimePicker
+                  label="Start date"
+                  inputVariant="outlined"
+                  format="DD/MM/yyyy HH:mm"
+                  className={classes.formElement}
+                  onChange={(value) => props.onChange(value)}
+                  value={props.value}
+                />
+              )}
             />
-            <DateTimePicker
-              id="endDate"
+            <Controller
               name="endDate"
-              label="End date"
-              inputVariant="outlined"
-              format="DD/MM/yyyy HH:mm"
-              disablePast
-              className={classes.formElement}
-              inputRef={register({ required: true })}
+              control={control}
+              defaultValue={new Date()}
+              rules={{ required: true }}
+              render={(props) => (
+                <DateTimePicker
+                  label="End date"
+                  inputVariant="outlined"
+                  format="DD/MM/yyyy HH:mm"
+                  className={classes.formElement}
+                  onChange={(value) => props.onChange(value)}
+                  value={props.value}
+                />
+              )}
             />
             <DialogContentText style={{ marginBottom: 0 }}>
               Apply to course
             </DialogContentText>
-            <Controller
-              name="allCourses"
-              control={control}
-              defaultValue={true}
-              rules={{ required: true }}
-              render={(props) => (
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={props.value}
-                      onChange={(e) => {
-                        props.onChange(e.target.checked);
-                        setIsAllCoursesApplied(e.target.checked);
-                      }}
-                      name="allCourses"
-                    />
-                  }
-                  label="All courses"
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isAllCoursesApplied}
+                  onChange={(e) => {
+                    setIsAllCoursesApplied(e.target.checked);
+                  }}
+                  name="allCourses"
                 />
-              )}
+              }
+              label="All courses"
             />
             <Typography
               style={{ fontSize: 10, marginBottom: "1rem" }}
@@ -173,17 +264,41 @@ const RegistrationDialog = (props) => {
                   padding: "0.5rem",
                 }}
               >
-                <TextField
-                  id="searchCourse"
-                  name="searchCourse"
-                  autoComplete="off"
-                  label="Search course"
-                  variant="outlined"
-                  value={courseToSearch}
-                  onChange={(e) => setCourseToSearch(e.target.value)}
-                  className={classes.formElement}
-                />
-                <CheckboxList />
+                <Grid container>
+                  <Grid item xs={10}>
+                    <TextField
+                      id="searchCourse"
+                      name="searchCourse"
+                      autoComplete="off"
+                      label="Enter course ID"
+                      variant="outlined"
+                      value={courseToSearch}
+                      onChange={(e) => setCourseToSearch(e.target.value)}
+                      className={classes.formElement}
+                    />
+                  </Grid>
+                  <Grid
+                    item
+                    xs={2}
+                    style={{ textAlign: "center", marginTop: "0.5rem" }}
+                  >
+                    <IconButton color="primary" onClick={handleSearchCourse}>
+                      <SearchIcon />
+                    </IconButton>
+                  </Grid>
+                </Grid>
+                {fetchCourseStatus === "loading" ? (
+                  <CircularProgress
+                    size={24}
+                    className={classes.buttonProgress}
+                  />
+                ) : (
+                  <CheckboxList
+                    selectedItems={selectedCourses}
+                    onSelectItem={handleSelectCourse}
+                    items={coursesToSelect}
+                  />
+                )}
               </div>
             ) : null}
           </DialogContent>

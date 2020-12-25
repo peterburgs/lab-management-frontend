@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/index";
+import produce from "immer";
 
 const initialState = {
   semester: null,
@@ -27,13 +28,18 @@ const initialState = {
   updateSemesterError: null,
   openRegistrationStatus: "idle",
   openRegistrationError: null,
+  closeRegistrationStatus: "idle",
+  closeRegistrationError: null,
 };
 
 export const startSemester = createAsyncThunk(
   "registration/startSemester",
   async (semester, { rejectWithValue }) => {
     try {
-      const response = await api.post("/semesters", semester);
+      const stabilizedSemester = produce(semester, (draft) => {
+        draft.startDate = new Date(draft.startDate).toISOString();
+      });
+      const response = await api.post("/semesters", stabilizedSemester);
       return response.data;
     } catch (err) {
       console.log(err);
@@ -46,9 +52,12 @@ export const updateSemester = createAsyncThunk(
   "registration/updateSemester",
   async (semester, { getState, rejectWithValue }) => {
     try {
+      const stabilizedSemester = produce(semester, (draft) => {
+        draft.startDate = new Date(draft.startDate).toISOString();
+      });
       const res = await api.put(
         `/semesters/${getState().registration.semester._id}`,
-        semester
+        stabilizedSemester
       );
       console.log(res.data);
       return res.data;
@@ -73,12 +82,43 @@ export const fetchSemester = createAsyncThunk(
 
 export const openRegistration = createAsyncThunk(
   "registration/openRegistration",
-  async (registration, { dispatch, rejectWithValue }) => {
+  async (registration, { dispatch, rejectWithValue, getState }) => {
     try {
-      const res = await api.post("/registrations", registration);
+      const stabilizedRegistration = produce(registration, (draft) => {
+        draft.startDate = new Date(draft.startDate).toISOString();
+        draft.endDate = new Date(draft.endDate).toISOString();
+        draft.isOpening = true;
+        draft.semester = getState().registration.semester._id;
+        draft.patch = getState().registration.semester.registrations.length + 1;
+      });
+      const res = await api.post("/registrations", stabilizedRegistration);
       dispatch(fetchSemester());
       return res.data;
     } catch (err) {
+      console.log(err);
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const closeRegistration = createAsyncThunk(
+  "registration/closeRegistration",
+  async (_, { dispatch, rejectWithValue, getState }) => {
+    try {
+      const openingRegistration = getState().registration.semester.registrations.find(
+        (reg) => reg.isOpening === true
+      );
+      const stabilizedRegistration = produce(openingRegistration, (draft) => {
+        draft.isOpening = false;
+      });
+      const res = await api.put(
+        `/registrations/${openingRegistration._id}`,
+        stabilizedRegistration
+      );
+      dispatch(fetchSemester());
+      return res.data;
+    } catch (err) {
+      console.log(err);
       return rejectWithValue(err.message);
     }
   }
@@ -100,6 +140,10 @@ const registrationSlice = createSlice({
       state.openRegistrationError = null;
       state.openRegistrationStatus = "idle";
     },
+    closeRegistrationRefreshed(state) {
+      state.closeRegistrationError = null;
+      state.closeRegistrationStatus = "idle";
+    },
     fetchSemesterRefreshed(state) {
       state.fetchSemesterError = null;
       state.fetchSemesterStatus = "idle";
@@ -115,6 +159,16 @@ const registrationSlice = createSlice({
     [openRegistration.rejected]: (state, action) => {
       state.openSemesterError = action.payload;
       state.openRegistrationStatus = "failed";
+    },
+    [closeRegistration.pending]: (state) => {
+      state.closeRegistrationStatus = "loading";
+    },
+    [closeRegistration.fulfilled]: (state, action) => {
+      state.closeRegistrationStatus = "succeeded";
+    },
+    [closeRegistration.rejected]: (state, action) => {
+      state.closeRegistrationError = action.payload;
+      state.closeRegistrationStatus = "failed";
     },
     [updateSemester.pending]: (state) => {
       state.updateSemesterStatus = "loading";
@@ -157,6 +211,7 @@ export const {
   fetchSemesterRefreshed,
   updateSemesterRefreshed,
   openRegistrationRefreshed,
+  closeRegistrationRefreshed,
 } = registrationSlice.actions;
 
 export default registrationSlice.reducer;

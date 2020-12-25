@@ -5,7 +5,6 @@ import {
   TableRow,
   TableSortLabel,
 } from "@material-ui/core";
-import PropTypes from "prop-types";
 import useStyles from "./EnhancedTableHead.styles";
 
 const EnhancedTableHead = (props) => {
@@ -47,15 +46,6 @@ const EnhancedTableHead = (props) => {
       </TableRow>
     </TableHead>
   );
-};
-
-EnhancedTableHead.propTypes = {
-  headCells: PropTypes.array.isRequired,
-  isAllowSort: PropTypes.bool.isRequired,
-  orderBy: PropTypes.string,
-  order: PropTypes.string,
-  onCreateSortHandler: PropTypes.func,
-  center: PropTypes.bool,
 };
 
 export default EnhancedTableHead;

@@ -4,7 +4,6 @@ import useStyles from "./SideBar.styles";
 import hamburgerIcon from "../../../assets/images/hamburger-icon.svg";
 import NavigationItem from "./NavigationItem/NavigationItem";
 import clsx from "clsx";
-import PropTypes from "prop-types";
 
 const SideBar = (props) => {
   const classes = useStyles();
@@ -279,15 +278,6 @@ const SideBar = (props) => {
       </Hidden>
     </nav>
   );
-};
-
-SideBar.propTypes = {
-  maximized: PropTypes.bool.isRequired,
-  mobileOpen: PropTypes.bool.isRequired,
-  onMobileClose: PropTypes.func.isRequired,
-  window: PropTypes.object,
-  onToggleMaximize: PropTypes.func.isRequired,
-  userRole: PropTypes.string.isRequired,
 };
 
 export default SideBar;

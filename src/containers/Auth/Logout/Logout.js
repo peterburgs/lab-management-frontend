@@ -10,7 +10,7 @@ const Logout = () => {
     dispatch(logout());
   });
 
-  return <Redirect to="/" />;
+  return <Redirect to="/signin" />;
 };
 
 export default Logout;
