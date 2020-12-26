@@ -20,8 +20,12 @@ import { useSelector } from "react-redux";
 // Layout HOC includes AppBar and SideBar
 const Layout = (props) => {
   const [maximizedSideBar, setMaximizedSideBar] = useState(true);
-  const [openedMobileSideBar, setOpenedMobileSideBar] = useState(false);
-  const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
+  const [openedMobileSideBar, setOpenedMobileSideBar] = useState(
+    false
+  );
+  const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(
+    null
+  );
   const openAccountMenu = Boolean(accountMenuAnchorEl);
   const history = useHistory();
   const classes = useStyles();

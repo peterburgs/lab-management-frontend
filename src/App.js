@@ -39,7 +39,9 @@ const theme = createMuiTheme({
 
 function App() {
   const classes = useStyles();
-  const isAuthenticated = useSelector((state) => state.auth.token !== null);
+  const isAuthenticated = useSelector(
+    (state) => state.auth.token !== null
+  );
   const userRole = useSelector((state) => state.auth.userRole);
 
   let routes = (
@@ -55,8 +57,7 @@ function App() {
       <Redirect to="/signin" />
     </Switch>
   );
-
-  if (isAuthenticated && userRole === "admin") {
+  if (isAuthenticated && userRole === "ADMIN") {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -111,7 +112,7 @@ function App() {
       </Switch>
     );
   }
-  if (isAuthenticated && userRole === "lecturer") {
+  if (isAuthenticated && userRole === "LECTURER") {
     routes = (
       <Switch>
         <Route path="/" exact>
@@ -130,6 +131,9 @@ function App() {
               <LecturerRegistration />
             </ContentContainer>
           </Layout>
+        </Route>
+        <Route path="/logout">
+          <Logout />
         </Route>
         <Redirect to="/" />
       </Switch>

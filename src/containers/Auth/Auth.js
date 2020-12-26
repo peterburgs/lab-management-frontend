@@ -1,42 +1,109 @@
-import { Button, Snackbar, IconButton } from "@material-ui/core";
-import React, { useState } from "react";
+import {
+  Button,
+  Snackbar,
+  IconButton,
+  FormControlLabel,
+  Checkbox,
+} from "@material-ui/core";
+import React, { useState, useCallback, useEffect } from "react";
 import useStyles from "./Auth.styles";
 import authBackground from "../../assets/images/auth-background.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { authSuccess, logout } from "./AuthSlice";
-import { useDispatch } from "react-redux";
+import { getUserRefresh, setUserRole } from "./AuthSlice";
+import { useDispatch, useSelector } from "react-redux";
 import { GoogleLogin } from "react-google-login";
 import CloseIcon from "@material-ui/icons/Close";
+import { getUser } from "./AuthSlice";
+import { unwrapResult } from "@reduxjs/toolkit";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 const clientId =
   "842135343547-0l11d5qs9q4jqchn7i45p75e5bf2jpqf.apps.googleusercontent.com";
+
+const useGetUser = () => {
+  const dispatch = useDispatch();
+  const getUserStatus = useSelector(
+    (state) => state.auth.getUserStatus
+  );
+  const getUserError = useSelector(
+    (state) => state.auth.getUserError
+  );
+
+  const handleGetUser = async ({
+    email,
+    token,
+    expirationDate,
+    userRole,
+  }) => {
+    console.log(email);
+    try {
+      const res = await dispatch(
+        getUser({ email, token, expirationDate, userRole })
+      );
+      unwrapResult(res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return [getUserStatus, getUserError, handleGetUser];
+};
 
 const Auth = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
   const [authError, setAuthError] = useState(null);
+  const user = useSelector((state) => state.auth.user);
+  const userRole = useSelector((state) => state.auth.userRole);
 
-  const handleAuthSuccess = (res) => {
-    const expirationDate = new Date(
-      new Date().getTime() + res.tokenObj.expires_in * 1000
-    );
-    console.log("Set Item");
-    localStorage.setItem("token", res.tokenObj.id_token);
-    localStorage.setItem("expirationDate", expirationDate);
-    localStorage.setItem("name", res.profileObj.name);
-    localStorage.setItem("imageUrl", res.profileObj.imageUrl);
-    dispatch(authSuccess({ token: res.tokenObj.id_token }));
-    setTimeout(() => {
-      dispatch(logout());
-    }, res.tokenObj.expires_in * 1000);
-  };
+  const [isAdmin, setIsAdmin] = useState(false);
 
-  const handleAuthError = (res) => {
-    console.log(res);
+  const [getUserStatus, getUserError, handleGetUser] = useGetUser();
+
+  const handleChange = useCallback((e) => {
+    setIsAdmin(e.target.checked);
+    dispatch(setUserRole(e.target.checked ? "ADMIN" : "LECTURER"));
+  });
+
+  useEffect(() => {
+    localStorage.setItem("userRole", "LECTURER");
+    dispatch(setUserRole("LECTURER"));
+    if (user) {
+      console.log(user);
+    }
+  }, [user]);
+
+  const handleAuthSuccess = useCallback(
+    async (res) => {
+      const expirationDate = new Date(
+        new Date().getTime() + res.tokenObj.expires_in * 1000
+      );
+      localStorage.setItem("token", res.tokenObj.id_token);
+      localStorage.setItem("expirationDate", expirationDate);
+      localStorage.setItem("name", res.profileObj.name);
+      localStorage.setItem("imageUrl", res.profileObj.imageUrl);
+      localStorage.setItem("email", res.profileObj.email);
+      localStorage.setItem("userRole", userRole);
+      await handleGetUser({
+        email: String(res.profileObj.email),
+        token: res.tokenObj.id_token,
+        expirationDate,
+        userRole,
+      });
+    },
+    [handleGetUser]
+  );
+
+  const handleAuthError = useCallback((res) => {
     setAuthError(res);
-  };
+  }, []);
+
+  const handleClose = useCallback(() => {
+    setAuthError(null);
+    dispatch(getUserRefresh());
+  }, [setAuthError, dispatch]);
 
   return (
     <div className={classes.auth}>
@@ -45,17 +112,17 @@ const Auth = () => {
           vertical: "bottom",
           horizontal: "left",
         }}
-        open={authError ? true : false}
+        open={authError || getUserStatus === "failed" ? true : false}
         autoHideDuration={6000}
-        onClose={() => setAuthError(null)}
-        message={"Something went wrong"}
+        onClose={handleClose}
+        message={authError ? authError : getUserError}
         action={
           <React.Fragment>
             <IconButton
               size="small"
               aria-label="close"
               color="inherit"
-              onClick={() => setAuthError(null)}
+              onClick={handleClose}
             >
               <CloseIcon fontSize="small" />
             </IconButton>
@@ -67,25 +134,45 @@ const Auth = () => {
         alt="auth-background"
         src={authBackground}
       />
-      <GoogleLogin
-        clientId={clientId}
-        onSuccess={handleAuthSuccess}
-        onFailure={handleAuthError}
-        cookiePolicy={"single_host_origin"}
-        render={(renderProps) => (
-          <Button
-            className={classes.button}
-            startIcon={<FontAwesomeIcon icon={faGoogle} />}
-            variant="contained"
-            color="primary"
-            onClick={renderProps.onClick}
-            disabled={renderProps.disabled}
-          >
-            Login with Google
-          </Button>
-          
-        )}
-      />
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <GoogleLogin
+          clientId={clientId}
+          onSuccess={handleAuthSuccess}
+          onFailure={handleAuthError}
+          cookiePolicy={"single_host_origin"}
+          render={(renderProps) => (
+            <div style={{ position: "relative" }}>
+              <Button
+                className={classes.button}
+                startIcon={<FontAwesomeIcon icon={faGoogle} />}
+                variant="contained"
+                color="primary"
+                onClick={renderProps.onClick}
+                disabled={renderProps.disabled}
+              >
+                Login with Google
+              </Button>
+              {getUserStatus === "loading" && (
+                <CircularProgress
+                  size={24}
+                  className={classes.buttonProgress}
+                />
+              )}
+            </div>
+          )}
+        />
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={isAdmin}
+              onChange={handleChange}
+              name="adminRole"
+              color="primary"
+            />
+          }
+          label="Admin"
+        />
+      </div>
     </div>
   );
 };
