@@ -12,15 +12,15 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { Link } from "react-router-dom";
-import useStyles from "./LecturerTable.styles";
+import { setUserIdToEdit, setUserIdToDelete } from "../UserSlice";
+import useStyles from "./UserTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
-import PropTypes from "prop-types";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
 import AddIcon from "@material-ui/icons/Add";
+import { useDispatch } from "react-redux";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -30,15 +30,16 @@ const StyledTableRow = withStyles(() => ({
   },
 }))(TableRow);
 
-const LecturerTable = (props) => {
+const UserTable = (props) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("name");
+  const [orderBy, setOrderBy] = useState("fullName");
 
   const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
-  const openActionMenu = Boolean(actionMenuAnchorEl);
 
   const headCells = [
     {
@@ -46,7 +47,7 @@ const LecturerTable = (props) => {
       label: "#",
     },
     {
-      id: "id",
+      id: "_id",
       label: "ID",
     },
     {
@@ -54,8 +55,8 @@ const LecturerTable = (props) => {
       label: "Full name",
     },
     {
-      id: "Email",
-      label: "email",
+      id: "email",
+      label: "Email",
     },
     {
       id: "createdAt",
@@ -110,7 +111,7 @@ const LecturerTable = (props) => {
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, props.lecturers.length - page * rowsPerPage);
+    Math.min(rowsPerPage, props.users.length - page * rowsPerPage);
 
   // handle open menu context when clicking account icon
   const handleOpenActionMenu = (event) => {
@@ -118,22 +119,22 @@ const LecturerTable = (props) => {
   };
 
   // handle close menu context when clicking account icon
-  const handleActionMenuClose = () => {
+  const handleCloseActionMenu = () => {
     setActionMenuAnchorEl(null);
   };
 
   return (
-    <div className={classes.lecturerTable}>
+    <div className={classes.userTable}>
       <Paper className={classes.paper}>
-        <EnhancedToolbar title={"Lecturers"}>
+        <EnhancedToolbar title={"Users"}>
           <Button
             className={classes.button}
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
-            onClick={props.onAddLecturer}
+            onClick={props.onAddUser}
           >
-            New lecturer
+            New user
           </Button>
         </EnhancedToolbar>
         <TableContainer>
@@ -147,28 +148,38 @@ const LecturerTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.lecturers, getComparator(order, orderBy))
+                {stableSort(props.users, getComparator(order, orderBy))
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((row, index) => (
-                    <StyledTableRow key={row.id} className={classes.row}>
+                    <StyledTableRow key={row._id} className={classes.row}>
                       <TableCell component="th" scope="row">
-                        {index + 1}
+                        {rowsPerPage * page + index + 1}
                       </TableCell>
-                      <TableCell align="left">{row.id}</TableCell>
+                      <TableCell align="left">{row._id}</TableCell>
                       <TableCell align="left">
-                        <Link to="/lecturers/id">{row.fullName}</Link>
+                        <Button
+                          style={{
+                            color: "#d7385e",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => {
+                            dispatch(setUserIdToEdit(row._id));
+                          }}
+                        >
+                          {row.fullName}
+                        </Button>
                       </TableCell>
                       <TableCell align="left">{row.email}</TableCell>
                       <TableCell align="left">{row.createdAt}</TableCell>
                       <TableCell align="center">
                         <IconButton
+                          id={`${row._id}-menu`} // <-- Magic code
                           onClick={handleOpenActionMenu}
                           style={{ padding: 0 }}
                         >
                           <MoreVertIcon />
                         </IconButton>
                         <Menu
-                          id="menu-appbar"
                           anchorEl={actionMenuAnchorEl}
                           anchorOrigin={{
                             vertical: "top",
@@ -179,12 +190,16 @@ const LecturerTable = (props) => {
                             vertical: "top",
                             horizontal: "right",
                           }}
-                          open={openActionMenu}
-                          onClose={handleActionMenuClose}
+                          open={
+                            actionMenuAnchorEl
+                              ? actionMenuAnchorEl.id === `${row._id}-menu`
+                              : false
+                          } // <-- Magic code
+                          onClose={handleCloseActionMenu}
                         >
                           <MenuItem
                             onClick={() => {
-                              props.onEditClick();
+                              dispatch(setUserIdToEdit(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -192,7 +207,7 @@ const LecturerTable = (props) => {
                           </MenuItem>
                           <MenuItem
                             onClick={() => {
-                              props.onDeleteClick();
+                              dispatch(setUserIdToDelete(row._id));
                               setActionMenuAnchorEl(null);
                             }}
                           >
@@ -214,7 +229,7 @@ const LecturerTable = (props) => {
         <TablePagination
           rowsPerPageOptions={[5, 10, 25]}
           component="div"
-          count={props.lecturers.length}
+          count={props.users.length}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
@@ -225,11 +240,4 @@ const LecturerTable = (props) => {
   );
 };
 
-LecturerTable.propTypes = {
-  lecturers: PropTypes.array.isRequired,
-  onAddLecturer: PropTypes.func.isRequired,
-  onEditClick: PropTypes.func.isRequired,
-  onDeleteClick: PropTypes.func.isRequired,
-};
-
-export default LecturerTable;
+export default UserTable;

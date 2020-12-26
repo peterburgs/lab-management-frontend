@@ -12,7 +12,6 @@ const initialState = {
   updateCourseError: null,
   fetchCourseStatus: "idle",
   fetchCourseError: null,
-  course: null,
   courseIdToEdit: null,
   courseIdToDelete: null,
   searchResult: [],
@@ -175,9 +174,6 @@ const coursesSlice = createSlice({
     [updateCourse.rejected]: (state, action) => {
       state.updateCourseStatus = "failed";
       state.updateCourseError = action.payload;
-    },
-    [getCourseById.fulfilled]: (state, action) => {
-      state.course = action.payload.course;
     },
     // fetch course reducers
     [fetchCourse.fulfilled]: (state, action) => {

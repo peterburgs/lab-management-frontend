@@ -1,7 +1,7 @@
 import { makeStyles } from "@material-ui/core/styles";
 
 export default makeStyles(() => ({
-  lecturerTable: {
+  userTable: {
     width: "100%",
   },
   paper: {

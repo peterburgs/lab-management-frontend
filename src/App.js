@@ -15,7 +15,7 @@ import Registration from "./containers/Registration/Registration";
 import Course from "./containers/Course/Course";
 import Lab from "./containers/Lab/Lab";
 import Request from "./containers/Request/Request";
-import Lecturer from "./containers/Lecturer/Lecturer";
+import User from "./containers/User/User";
 import ContentContainer from "./hoc/ContentContainer/ContentContainer";
 import Auth from "./containers/Auth/Auth";
 import ResolveAuth from "./containers/Auth/ResolveAuth/ResolveAuth";
@@ -97,10 +97,10 @@ function App() {
             </ContentContainer>
           </Layout>
         </Route>
-        <Route path="/lecturers">
+        <Route path="/users">
           <Layout>
             <ContentContainer>
-              <Lecturer />
+              <User />
             </ContentContainer>
           </Layout>
         </Route>
