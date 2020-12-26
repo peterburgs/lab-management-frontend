@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { logout, authSuccess } from "../AuthSlice";
+import { logout, getUser } from "../AuthSlice";
 import { useHistory } from "react-router-dom";
 
 const ResolveAuth = () => {
@@ -14,11 +14,9 @@ const ResolveAuth = () => {
       history.push("/signin");
     } else {
       const expirationDate = new Date(localStorage.getItem("expirationDate"));
+      const email = new Date(localStorage.getItem("email"));
       if (expirationDate > new Date()) {
-        dispatch(authSuccess({ token: token }));
-        setTimeout(() => {
-          dispatch(logout());
-        }, expirationDate.getTime() - new Date().getTime());
+        dispatch(getUser({ email, token, expirationDate }));
       } else {
         dispatch(logout());
         history.push("/signin");

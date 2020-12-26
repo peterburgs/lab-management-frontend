@@ -25,7 +25,7 @@ const Layout = (props) => {
   const openAccountMenu = Boolean(accountMenuAnchorEl);
   const history = useHistory();
   const classes = useStyles();
-  const userRole = useSelector((state) => state.auth.userRole);
+  const user = useSelector((state) => state.auth.user);
 
   // Handle maximize and minimize the side bar
   const handleToggleMaximizeSidebar = useCallback(() => {
@@ -70,7 +70,7 @@ const Layout = (props) => {
         mobileOpen={openedMobileSideBar}
         onToggleMaximize={handleToggleMaximizeSidebar}
         maximized={maximizedSideBar}
-        userRole={userRole}
+        userRoles={user.roles}
       />
       <ElevationScroll {...props}>
         <AppBar
