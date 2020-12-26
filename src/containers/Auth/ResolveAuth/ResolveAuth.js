@@ -13,10 +13,14 @@ const ResolveAuth = () => {
       dispatch(logout());
       history.push("/signin");
     } else {
-      const expirationDate = new Date(localStorage.getItem("expirationDate"));
-      const email = new Date(localStorage.getItem("email"));
+      const expirationDate = new Date(
+        localStorage.getItem("expirationDate")
+      );
+      const email = localStorage.getItem("email");
+      const userRole = localStorage.getItem("userRole");
       if (expirationDate > new Date()) {
-        dispatch(getUser({ email, token, expirationDate }));
+        console.log("Call getUser ResolveAuth.js");
+        dispatch(getUser({ email, token, expirationDate, userRole }));
       } else {
         dispatch(logout());
         history.push("/signin");

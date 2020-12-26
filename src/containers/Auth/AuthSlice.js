@@ -6,19 +6,24 @@ const initialState = {
   user: null,
   getUserStatus: "idle",
   getUserError: null,
+  userRole: "LECTURER",
 };
 
 export const getUser = createAsyncThunk(
   "auth/getUser",
-  async ({ email, token, expirationDate }, { rejectWithValue, dispatch }) => {
-    console.log(email);
+  async (
+    { email, token, expirationDate, userRole },
+    { rejectWithValue, dispatch, getState }
+  ) => {
     try {
       const res = await api.get("/auth", {
         params: {
+          role: getState().auth.userRole,
           email,
         },
       });
       dispatch(authSuccess({ token }));
+      dispatch(setUserRole(userRole));
       setTimeout(() => {
         dispatch(logout());
       }, expirationDate.getTime() - new Date().getTime());
@@ -49,6 +54,9 @@ const authSlice = createSlice({
       localStorage.removeItem("imageUrl");
       localStorage.removeItem("email");
     },
+    setUserRole(state, action) {
+      state.userRole = action.payload;
+    },
   },
   extraReducers: {
     [getUser.fulfilled]: (state, action) => {
@@ -60,7 +68,7 @@ const authSlice = createSlice({
     },
     [getUser.rejected]: (state, action) => {
       state.getUserStatus = "failed";
-      state.getUserError = "Invalid email";
+      state.getUserError = action.payload;
     },
   },
 });
@@ -70,6 +78,7 @@ export const {
   authFailure,
   authSuccess,
   getUserRefresh,
+  setUserRole,
 } = authSlice.actions;
 
 export default authSlice.reducer;

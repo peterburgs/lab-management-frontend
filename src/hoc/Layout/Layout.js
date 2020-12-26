@@ -20,12 +20,16 @@ import { useSelector } from "react-redux";
 // Layout HOC includes AppBar and SideBar
 const Layout = (props) => {
   const [maximizedSideBar, setMaximizedSideBar] = useState(true);
-  const [openedMobileSideBar, setOpenedMobileSideBar] = useState(false);
-  const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(null);
+  const [openedMobileSideBar, setOpenedMobileSideBar] = useState(
+    false
+  );
+  const [accountMenuAnchorEl, setAccountMenuAnchorEl] = useState(
+    null
+  );
   const openAccountMenu = Boolean(accountMenuAnchorEl);
   const history = useHistory();
   const classes = useStyles();
-  const user = useSelector((state) => state.auth.user);
+  const userRole = useSelector((state) => state.auth.userRole);
 
   // Handle maximize and minimize the side bar
   const handleToggleMaximizeSidebar = useCallback(() => {
@@ -70,7 +74,7 @@ const Layout = (props) => {
         mobileOpen={openedMobileSideBar}
         onToggleMaximize={handleToggleMaximizeSidebar}
         maximized={maximizedSideBar}
-        userRoles={user.roles}
+        userRole={userRole}
       />
       <ElevationScroll {...props}>
         <AppBar

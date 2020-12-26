@@ -10,7 +10,7 @@ import useStyles from "./Auth.styles";
 import authBackground from "../../assets/images/auth-background.svg";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faGoogle } from "@fortawesome/free-brands-svg-icons";
-import { getUserRefresh, logout } from "./AuthSlice";
+import { getUserRefresh, setUserRole } from "./AuthSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { GoogleLogin } from "react-google-login";
 import CloseIcon from "@material-ui/icons/Close";
@@ -23,13 +23,24 @@ const clientId =
 
 const useGetUser = () => {
   const dispatch = useDispatch();
-  const getUserStatus = useSelector((state) => state.auth.getUserStatus);
-  const getUserError = useSelector((state) => state.auth.getUserError);
+  const getUserStatus = useSelector(
+    (state) => state.auth.getUserStatus
+  );
+  const getUserError = useSelector(
+    (state) => state.auth.getUserError
+  );
 
-  const handleGetUser = async ({ email, token }) => {
+  const handleGetUser = async ({
+    email,
+    token,
+    expirationDate,
+    userRole,
+  }) => {
     console.log(email);
     try {
-      const res = await dispatch(getUser({ email, token }));
+      const res = await dispatch(
+        getUser({ email, token, expirationDate, userRole })
+      );
       unwrapResult(res);
     } catch (err) {
       console.log(err);
@@ -44,12 +55,21 @@ const Auth = () => {
   const dispatch = useDispatch();
 
   const [authError, setAuthError] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
   const user = useSelector((state) => state.auth.user);
+  const userRole = useSelector((state) => state.auth.userRole);
+
+  const [isAdmin, setIsAdmin] = useState(false);
 
   const [getUserStatus, getUserError, handleGetUser] = useGetUser();
 
+  const handleChange = useCallback((e) => {
+    setIsAdmin(e.target.checked);
+    dispatch(setUserRole(e.target.checked ? "ADMIN" : "LECTURER"));
+  });
+
   useEffect(() => {
+    localStorage.setItem("userRole", "LECTURER");
+    dispatch(setUserRole("LECTURER"));
     if (user) {
       console.log(user);
     }
@@ -65,10 +85,12 @@ const Auth = () => {
       localStorage.setItem("name", res.profileObj.name);
       localStorage.setItem("imageUrl", res.profileObj.imageUrl);
       localStorage.setItem("email", res.profileObj.email);
+      localStorage.setItem("userRole", userRole);
       await handleGetUser({
         email: String(res.profileObj.email),
         token: res.tokenObj.id_token,
         expirationDate,
+        userRole,
       });
     },
     [handleGetUser]
@@ -143,7 +165,7 @@ const Auth = () => {
           control={
             <Checkbox
               checked={isAdmin}
-              onChange={(e) => setIsAdmin(e.target.checked)}
+              onChange={handleChange}
               name="adminRole"
               color="primary"
             />

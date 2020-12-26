@@ -159,7 +159,7 @@ const SideBar = (props) => {
     </React.Fragment>
   );
 
-  if (props.userRoles.indexOf("LECTURER") !== -1) {
+  if (props.userRole === "LECTURER") {
     navItems = (
       <React.Fragment>
         <NavigationItem
