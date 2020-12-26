@@ -130,7 +130,7 @@ const LabTable = (props) => {
             startIcon={<AddIcon />}
             onClick={props.onAddLab}
           >
-            New Lab
+            New lab
           </Button>
         </EnhancedToolbar>
         <TableContainer>

@@ -166,9 +166,6 @@ const labsSlice = createSlice({
       state.updateLabStatus = "failed";
       state.updateLabError = action.payload;
     },
-    [getLabById.fulfilled]: (state, action) => {
-      state.lab = action.payload.lab;
-    },
     // fetch Lab reducers
     [fetchLab.fulfilled]: (state, action) => {
       state.labs = action.payload.labs;

@@ -135,7 +135,7 @@ const LabDialog = (props) => {
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle id="form-dialog-title">
-            {labIdToEdit ? "Edit Lab" : "Add new Lab"}
+            {labIdToEdit ? "Edit lab" : "Add new lab"}
           </DialogTitle>
           <DialogContent>
             <TextField
