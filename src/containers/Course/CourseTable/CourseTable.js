@@ -12,7 +12,10 @@ import {
   Menu,
   MenuItem,
 } from "@material-ui/core";
-import { setCourseIdToEdit, setCourseIdToDelete } from "../CourseSlice";
+import {
+  setCourseIdToEdit,
+  setCourseIdToDelete,
+} from "../CourseSlice";
 import useStyles from "./CourseTable.styles";
 import MoreVertIcon from "@material-ui/icons/MoreVert";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
@@ -34,7 +37,7 @@ const CourseTable = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("courseName");
@@ -139,8 +142,13 @@ const CourseTable = (props) => {
           </Button>
         </EnhancedToolbar>
         <TableContainer>
-          <SimpleBar style={{ maxHeight: 400 }}>
-            <Table style={{ minWidth: 700 }} stickyHeader>
+          <SimpleBar style={{ maxHeight: "calc(100% - 10px)" }}>
+            <Table
+              style={{
+                minWidth: 700,
+              }}
+              stickyHeader
+            >
               <EnhancedTableHead
                 order={order}
                 orderBy={orderBy}
@@ -149,10 +157,19 @@ const CourseTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.courses, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                {stableSort(
+                  props.courses,
+                  getComparator(order, orderBy)
+                )
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   .map((row, index) => (
-                    <StyledTableRow key={row._id} className={classes.row}>
+                    <StyledTableRow
+                      key={row._id}
+                      className={classes.row}
+                    >
                       <TableCell component="th" scope="row">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
@@ -174,7 +191,9 @@ const CourseTable = (props) => {
                       <TableCell align="center">
                         {row.numberOfCredits}
                       </TableCell>
-                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="left">
+                        {row.createdAt}
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton
                           id={`${row._id}-menu`} // <-- Magic code
@@ -196,7 +215,8 @@ const CourseTable = (props) => {
                           }}
                           open={
                             actionMenuAnchorEl
-                              ? actionMenuAnchorEl.id === `${row._id}-menu`
+                              ? actionMenuAnchorEl.id ===
+                                `${row._id}-menu`
                               : false
                           } // <-- Magic code
                           onClose={handleCloseActionMenu}
@@ -231,7 +251,7 @@ const CourseTable = (props) => {
           </SimpleBar>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10]}
           component="div"
           count={props.courses.length}
           rowsPerPage={rowsPerPage}

@@ -26,7 +26,10 @@ import {
   openRegistrationRefreshed,
 } from "../RegistrationSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
-import { fetchCourse, fetchCourseRefreshed } from "../../Course/CourseSlice";
+import {
+  fetchCourse,
+  fetchCourseRefreshed,
+} from "../../Course/CourseSlice";
 import SearchIcon from "@material-ui/icons/Search";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -82,7 +85,10 @@ const useFetchCourse = () => {
       })();
     }
     return () => {
-      if (fetchCourseStatus === "failed" || fetchCourseStatus === "succeeded") {
+      if (
+        fetchCourseStatus === "failed" ||
+        fetchCourseStatus === "succeeded"
+      ) {
         dispatch(fetchCourseRefreshed());
       }
     };
@@ -102,7 +108,9 @@ const RegistrationDialog = (props) => {
     handleOpenRegistration,
   ] = useOpenRegistration();
 
-  const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(true);
+  const [isAllCoursesApplied, setIsAllCoursesApplied] = useState(
+    true
+  );
   const [courseToSearch, setCourseToSearch] = useState("");
   const [fetchCourseStatus, fetchCourseError] = useFetchCourse();
 
@@ -129,11 +137,18 @@ const RegistrationDialog = (props) => {
     } else {
       registration = {
         ...data,
-        registrableCourses: selectedCourses.map((course) => course._id),
+        registrableCourses: selectedCourses.map(
+          (course) => course._id
+        ),
       };
     }
-    await handleOpenRegistration(registration);
-    props.onFinish();
+    const timeDiff = new Date(data.endDate) - new Date();
+    if (timeDiff <= 0) {
+      alert("Invalid end date");
+    } else {
+      await handleOpenRegistration(registration);
+      props.onFinish();
+    }
   };
 
   const handleClose = useCallback(() => {
@@ -179,13 +194,16 @@ const RegistrationDialog = (props) => {
     <React.Fragment>
       <CustomizedSnackbar
         open={
-          openRegistrationStatus === "failed" || fetchCourseError === "failed"
+          openRegistrationStatus === "failed" ||
+          fetchCourseError === "failed"
             ? true
             : false
         }
         onClose={() => handleClose()}
         message={
-          openRegistrationError ? openRegistrationError : fetchCourseError
+          openRegistrationError
+            ? openRegistrationError
+            : fetchCourseError
         }
         severity="error"
       />
@@ -203,7 +221,9 @@ const RegistrationDialog = (props) => {
         aria-labelledby="form-dialog-title"
       >
         <form onSubmit={handleSubmit(onSubmit)}>
-          <DialogTitle id="form-dialog-title">Open a registration</DialogTitle>
+          <DialogTitle id="form-dialog-title">
+            Open a registration
+          </DialogTitle>
           <DialogContent>
             <Controller
               name="startDate"
@@ -214,6 +234,7 @@ const RegistrationDialog = (props) => {
                 <DateTimePicker
                   label="Start date"
                   inputVariant="outlined"
+                  ampm={false}
                   format="DD/MM/yyyy HH:mm"
                   className={classes.formElement}
                   onChange={(value) => props.onChange(value)}
@@ -231,6 +252,9 @@ const RegistrationDialog = (props) => {
                   label="End date"
                   inputVariant="outlined"
                   format="DD/MM/yyyy HH:mm"
+                  ampm={false}
+                  disablePast
+                  disable
                   className={classes.formElement}
                   onChange={(value) => props.onChange(value)}
                   value={props.value}
@@ -273,16 +297,24 @@ const RegistrationDialog = (props) => {
                       label="Enter course ID"
                       variant="outlined"
                       value={courseToSearch}
-                      onChange={(e) => setCourseToSearch(e.target.value)}
+                      onChange={(e) =>
+                        setCourseToSearch(e.target.value)
+                      }
                       className={classes.formElement}
                     />
                   </Grid>
                   <Grid
                     item
                     xs={2}
-                    style={{ textAlign: "center", marginTop: "0.5rem" }}
+                    style={{
+                      textAlign: "center",
+                      marginTop: "0.5rem",
+                    }}
                   >
-                    <IconButton color="primary" onClick={handleSearchCourse}>
+                    <IconButton
+                      color="primary"
+                      onClick={handleSearchCourse}
+                    >
                       <SearchIcon />
                     </IconButton>
                   </Grid>
