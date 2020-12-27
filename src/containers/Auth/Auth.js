@@ -148,7 +148,9 @@ const Auth = () => {
                 variant="contained"
                 color="primary"
                 onClick={renderProps.onClick}
-                disabled={renderProps.disabled}
+                disabled={
+                  renderProps.disabled || getUserStatus === "loading"
+                }
               >
                 Login with Google
               </Button>

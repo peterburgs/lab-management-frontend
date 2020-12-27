@@ -22,7 +22,7 @@ export const getUser = createAsyncThunk(
           email,
         },
       });
-      dispatch(authSuccess({ token }));
+      dispatch(authSuccess({ token, user: res.data.user }));
       dispatch(setUserRole(userRole));
       setTimeout(() => {
         dispatch(logout());
@@ -41,6 +41,7 @@ const authSlice = createSlice({
   reducers: {
     authSuccess(state, action) {
       state.token = action.payload.token;
+      state.user = action.payload.user;
     },
     getUserRefresh(state, action) {
       state.getUserStatus = "idle";

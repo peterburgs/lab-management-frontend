@@ -34,7 +34,7 @@ const LabTable = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
   const [orderBy, setOrderBy] = useState("labName");
@@ -107,7 +107,8 @@ const LabTable = (props) => {
   };
 
   const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, props.labs.length - page * rowsPerPage);
+    rowsPerPage -
+    Math.min(rowsPerPage, props.labs.length - page * rowsPerPage);
 
   // handle open menu context when clicking account icon
   const handleOpenActionMenu = (event) => {
@@ -134,7 +135,7 @@ const LabTable = (props) => {
           </Button>
         </EnhancedToolbar>
         <TableContainer>
-          <SimpleBar style={{ maxHeight: 400 }}>
+          <SimpleBar style={{ maxHeight: "calc(100% - 10px)" }}>
             <Table style={{ minWidth: 700 }} stickyHeader>
               <EnhancedTableHead
                 order={order}
@@ -145,9 +146,15 @@ const LabTable = (props) => {
               />
               <TableBody>
                 {stableSort(props.labs, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   .map((row, index) => (
-                    <StyledTableRow key={row._id} className={classes.row}>
+                    <StyledTableRow
+                      key={row._id}
+                      className={classes.row}
+                    >
                       <TableCell component="th" scope="row">
                         {rowsPerPage * page + index + 1}
                       </TableCell>
@@ -165,8 +172,12 @@ const LabTable = (props) => {
                           {row.labName}
                         </Button>
                       </TableCell>
-                      <TableCell align="center">{row.capacity}</TableCell>
-                      <TableCell align="left">{row.createdAt}</TableCell>
+                      <TableCell align="center">
+                        {row.capacity}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.createdAt}
+                      </TableCell>
                       <TableCell align="center">
                         <IconButton
                           id={`${row._id}-menu`} // <-- Magic code
@@ -188,7 +199,8 @@ const LabTable = (props) => {
                           }}
                           open={
                             actionMenuAnchorEl
-                              ? actionMenuAnchorEl.id === `${row._id}-menu`
+                              ? actionMenuAnchorEl.id ===
+                                `${row._id}-menu`
                               : false
                           } // <-- Magic code
                           onClose={handleCloseActionMenu}
@@ -223,7 +235,7 @@ const LabTable = (props) => {
           </SimpleBar>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={10}
           component="div"
           count={props.labs.length}
           rowsPerPage={rowsPerPage}
