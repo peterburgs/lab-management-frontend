@@ -4,22 +4,6 @@ import produce from "immer";
 
 const initialState = {
   semester: null,
-  teachings: [
-    {
-      id: 1,
-      lecturerId: 123,
-      lecturerName: "Le Vinh Thinh A",
-      courseName: "New technology",
-      group: 1,
-    },
-    {
-      id: 2,
-      lecturerId: 124,
-      lecturerName: "Le Vinh Thinh B",
-      courseName: "New technology",
-      group: 1,
-    },
-  ],
   startSemesterStatus: "idle",
   startSemesterError: null,
   fetchSemesterStatus: "idle",
@@ -30,6 +14,9 @@ const initialState = {
   openRegistrationError: null,
   closeRegistrationStatus: "idle",
   closeRegistrationError: null,
+  generateScheduleStatus: "idle",
+  generateScheduleError: null,
+  registrationToGenerate: null,
 };
 
 export const startSemester = createAsyncThunk(
@@ -38,8 +25,12 @@ export const startSemester = createAsyncThunk(
     try {
       const stabilizedSemester = produce(semester, (draft) => {
         draft.startDate = new Date(draft.startDate).toISOString();
+        draft.isOpening = true;
       });
-      const response = await api.post("/semesters", stabilizedSemester);
+      const response = await api.post(
+        "/semesters",
+        stabilizedSemester
+      );
       return response.data;
     } catch (err) {
       console.log(err);
@@ -84,14 +75,21 @@ export const openRegistration = createAsyncThunk(
   "registration/openRegistration",
   async (registration, { dispatch, rejectWithValue, getState }) => {
     try {
-      const stabilizedRegistration = produce(registration, (draft) => {
-        draft.startDate = new Date(draft.startDate).toISOString();
-        draft.endDate = new Date(draft.endDate).toISOString();
-        draft.isOpening = true;
-        draft.semester = getState().registration.semester._id;
-        draft.patch = getState().registration.semester.registrations.length + 1;
-      });
-      const res = await api.post("/registrations", stabilizedRegistration);
+      const stabilizedRegistration = produce(
+        registration,
+        (draft) => {
+          draft.startDate = new Date(draft.startDate).toISOString();
+          draft.endDate = new Date(draft.endDate).toISOString();
+          draft.isOpening = true;
+          draft.semester = getState().registration.semester._id;
+          draft.patch =
+            getState().registration.semester.registrations.length + 1;
+        }
+      );
+      const res = await api.post(
+        "/registrations",
+        stabilizedRegistration
+      );
       dispatch(fetchSemester());
       return res.data;
     } catch (err) {
@@ -108,9 +106,12 @@ export const closeRegistration = createAsyncThunk(
       const openingRegistration = getState().registration.semester.registrations.find(
         (reg) => reg.isOpening === true
       );
-      const stabilizedRegistration = produce(openingRegistration, (draft) => {
-        draft.isOpening = false;
-      });
+      const stabilizedRegistration = produce(
+        openingRegistration,
+        (draft) => {
+          draft.isOpening = false;
+        }
+      );
       const res = await api.put(
         `/registrations/${openingRegistration._id}`,
         stabilizedRegistration
@@ -119,6 +120,23 @@ export const closeRegistration = createAsyncThunk(
       return res.data;
     } catch (err) {
       console.log(err);
+      return rejectWithValue(err.message);
+    }
+  }
+);
+
+export const generateSchedule = createAsyncThunk(
+  "registration/generateSchedule",
+  async (isNew, { rejectWithValue, getState }) => {
+    try {
+      const res = await api.post("/schedules/generate", {
+        isNew: isNew,
+        registrationId: getState().registration
+          .registrationToGenerate,
+      });
+      return res.data;
+    } catch (err) {
+      console.log(err.message);
       return rejectWithValue(err.message);
     }
   }
@@ -148,6 +166,13 @@ const registrationSlice = createSlice({
       state.fetchSemesterError = null;
       state.fetchSemesterStatus = "idle";
     },
+    generateScheduleRefreshed(state) {
+      state.generateScheduleError = null;
+      state.generateScheduleStatus = "idle";
+    },
+    setRegistrationToGenerate(state, action) {
+      state.registrationToGenerate = action.payload;
+    },
   },
   extraReducers: {
     [openRegistration.pending]: (state) => {
@@ -157,8 +182,18 @@ const registrationSlice = createSlice({
       state.openRegistrationStatus = "succeeded";
     },
     [openRegistration.rejected]: (state, action) => {
-      state.openSemesterError = action.payload;
+      state.openRegistrationError = action.payload;
       state.openRegistrationStatus = "failed";
+    },
+    [generateSchedule.pending]: (state) => {
+      state.generateScheduleStatus = "loading";
+    },
+    [generateSchedule.fulfilled]: (state, action) => {
+      state.generateScheduleStatus = "succeeded";
+    },
+    [generateSchedule.rejected]: (state, action) => {
+      state.generateScheduleError = action.payload;
+      state.generateScheduleStatus = "failed";
     },
     [closeRegistration.pending]: (state) => {
       state.closeRegistrationStatus = "loading";
@@ -212,6 +247,8 @@ export const {
   updateSemesterRefreshed,
   openRegistrationRefreshed,
   closeRegistrationRefreshed,
+  generateScheduleRefreshed,
+  setRegistrationToGenerate,
 } = registrationSlice.actions;
 
 export default registrationSlice.reducer;

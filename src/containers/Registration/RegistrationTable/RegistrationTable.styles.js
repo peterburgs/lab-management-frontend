@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 
-export default makeStyles((theme) => ({
+export default makeStyles(() => ({
   registrationTable: {
     width: "100%",
   },
@@ -9,22 +9,21 @@ export default makeStyles((theme) => ({
     borderRadius: 8,
     marginBottom: 24,
   },
-  row: {
-    "&:hover": {
-      cursor: "pointer",
-      background: `${theme.palette.primary.main} !important`,
-      "& td": {
-        color: "white",
-      },
-      "& th": {
-        color: "white",
-      },
-    },
-  },
   button: {
     borderRadius: 8,
     textTransform: "none",
     minWidth: 150,
+    marginLeft: "0.5rem",
+  },
+  row: {
+    "& td": {
+      fontSize: 13,
+    },
+  },
+  button: {
+    borderRadius: 10,
+    textTransform: "none",
+    minWidth: 200,
     marginLeft: "0.5rem",
   },
 }));

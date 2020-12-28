@@ -61,6 +61,7 @@ export const addTeaching = createAsyncThunk(
         )._id,
         role: getState().auth.userRole,
       };
+      console.log(data);
       const response = await api.post("/teachings", data);
       return response.data;
     } catch (err) {

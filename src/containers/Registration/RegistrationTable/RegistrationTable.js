@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import {
+  IconButton,
   Paper,
   TableContainer,
   TableBody,
@@ -8,14 +9,22 @@ import {
   TableRow,
   TablePagination,
   Button,
+  Menu,
+  MenuItem,
   Typography,
 } from "@material-ui/core";
+import {
+  setTeachingIdToEdit,
+  setTeachingIdToDelete,
+} from "../../LecturerRegistration/LecturerRegistrationSlice";
 import useStyles from "./RegistrationTable.styles";
-import PropTypes from "prop-types";
+import MoreVertIcon from "@material-ui/icons/MoreVert";
 import EnhancedToolbar from "../../../hoc/EnhancedTableToolbar/EnhancedTableToolbar";
 import EnhancedTableHead from "../../../components/EnhancedTableHead/EnhancedTableHead";
 import { withStyles } from "@material-ui/core/styles";
 import SimpleBar from "simplebar-react";
+import AddIcon from "@material-ui/icons/Add";
+import { useDispatch } from "react-redux";
 
 const StyledTableRow = withStyles(() => ({
   root: {
@@ -27,32 +36,52 @@ const StyledTableRow = withStyles(() => ({
 
 const RegistrationTable = (props) => {
   const classes = useStyles();
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const dispatch = useDispatch();
+
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState("asc");
-  const [orderBy, setOrderBy] = useState("lecturerId");
+  const [orderBy, setOrderBy] = useState("courseName");
+
+  const [actionMenuAnchorEl, setActionMenuAnchorEl] = useState(null);
 
   const headCells = [
     {
       id: "#",
       label: "#",
     },
+
     {
-      id: "lecturerId",
-      label: "Lecturer ID",
-    },
-    {
-      id: "lecturerName",
-      label: "Lecturer name",
+      id: "courseId",
+      label: "Course ID",
     },
     {
       id: "courseName",
-      label: "Course name",
+      label: "Course Name",
     },
     {
       id: "group",
       isNumber: true,
       label: "Group",
+    },
+    {
+      id: "period",
+      label: "Period",
+    },
+    {
+      id: "credit",
+      isNumber: true,
+      label: "Credit",
+    },
+
+    {
+      id: "numberOfStudents",
+      isNumber: true,
+      label: "Number of Students",
+    },
+    {
+      id: "actions",
+      label: "Actions",
     },
   ];
 
@@ -99,10 +128,19 @@ const RegistrationTable = (props) => {
 
   const emptyRows =
     rowsPerPage -
-    Math.min(rowsPerPage, props.teachings.length - page * rowsPerPage);
+    Math.min(
+      rowsPerPage,
+      props.teachings.length - page * rowsPerPage
+    );
 
-  const handleClick = (id) => {
-    console.log(id);
+  // handle open menu context when clicking account icon
+  const handleOpenActionMenu = (event) => {
+    setActionMenuAnchorEl(event.currentTarget);
+  };
+
+  // handle close menu context when clicking account icon
+  const handleCloseActionMenu = () => {
+    setActionMenuAnchorEl(null);
   };
 
   return (
@@ -118,7 +156,7 @@ const RegistrationTable = (props) => {
                     marginLeft: "0.5rem",
                     color: "white",
                     background: "green",
-                    padding: "0.1rem 0.5rem",
+                    padding: "0.2rem",
                     borderRadius: 5,
                   }}
                 >
@@ -144,23 +182,14 @@ const RegistrationTable = (props) => {
             className={classes.button}
             variant="contained"
             color="primary"
+            startIcon={<AddIcon />}
+            onClick={props.onGenerateSchedule}
           >
-            Generate lab usage
-          </Button>
-          <Button
-            className={classes.button}
-            variant="contained"
-            style={{
-              minWidth: 100,
-              backgroundColor: "#388E3C",
-              color: "#fff",
-            }}
-          >
-            Export
+            Generate Schedule
           </Button>
         </EnhancedToolbar>
         <TableContainer>
-          <SimpleBar style={{ maxHeight: 300 }}>
+          <SimpleBar style={{ maxHeight: "calc(100% - 10px)" }}>
             <Table style={{ minWidth: 700 }} stickyHeader>
               <EnhancedTableHead
                 order={order}
@@ -170,35 +199,113 @@ const RegistrationTable = (props) => {
                 isAllowSort={true}
               />
               <TableBody>
-                {stableSort(props.teachings, getComparator(order, orderBy))
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                {stableSort(
+                  props.teachings,
+                  getComparator(order, orderBy)
+                )
+                  .slice(
+                    page * rowsPerPage,
+                    page * rowsPerPage + rowsPerPage
+                  )
                   .map((row, index) => (
                     <StyledTableRow
+                      key={row._id}
                       className={classes.row}
-                      hover
-                      onClick={() => handleClick(row.id)}
-                      key={row.id}
                     >
                       <TableCell component="th" scope="row">
-                        {index + 1}
+                        {rowsPerPage * page + index + 1}
                       </TableCell>
-                      <TableCell align="left">{row.lecturerId}</TableCell>
-                      <TableCell align="left">{row.lecturerName}</TableCell>
-                      <TableCell align="left">{row.courseName}</TableCell>
-                      <TableCell align="center">{row.group}</TableCell>
+                      <TableCell align="left">
+                        <Button
+                          style={{
+                            color: "#d7385e",
+                            fontWeight: "bold",
+                          }}
+                          onClick={() => {
+                            dispatch(setTeachingIdToEdit(row._id));
+                            console.log(row);
+                          }}
+                        >
+                          {row.course._id}
+                        </Button>
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.course.courseName}
+                      </TableCell>
+
+                      <TableCell align="center">
+                        {row.group}
+                      </TableCell>
+                      <TableCell align="left">
+                        {row.startPeriod}&nbsp;&#8594;&nbsp;
+                        {row.endPeriod}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.course.numberOfCredits}
+                      </TableCell>
+                      <TableCell align="center">
+                        {row.numberOfStudents}
+                      </TableCell>
+                      <TableCell align="center">
+                        <IconButton
+                          id={`${row._id}-menu`} // <-- Magic code
+                          onClick={handleOpenActionMenu}
+                          style={{ padding: 0 }}
+                        >
+                          <MoreVertIcon />
+                        </IconButton>
+                        <Menu
+                          anchorEl={actionMenuAnchorEl}
+                          anchorOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          keepMounted
+                          transformOrigin={{
+                            vertical: "top",
+                            horizontal: "right",
+                          }}
+                          open={
+                            actionMenuAnchorEl
+                              ? actionMenuAnchorEl.id ===
+                                `${row._id}-menu`
+                              : false
+                          } // <-- Magic code
+                          onClose={handleCloseActionMenu}
+                        >
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(setTeachingIdToEdit(row._id));
+                              setActionMenuAnchorEl(null);
+                            }}
+                          >
+                            Edit
+                          </MenuItem>
+                          <MenuItem
+                            onClick={() => {
+                              dispatch(
+                                setTeachingIdToDelete(row._id)
+                              );
+                              setActionMenuAnchorEl(null);
+                            }}
+                          >
+                            Delete
+                          </MenuItem>
+                        </Menu>
+                      </TableCell>
                     </StyledTableRow>
                   ))}
-                {emptyRows > 0 && (
+                {/* {emptyRows > 0 && (
                   <TableRow style={{ height: 53 * emptyRows }}>
                     <TableCell colSpan={5} />
                   </TableRow>
-                )}
+                )} */}
               </TableBody>
             </Table>
           </SimpleBar>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10]}
           component="div"
           count={props.teachings.length}
           rowsPerPage={rowsPerPage}
@@ -209,10 +316,6 @@ const RegistrationTable = (props) => {
       </Paper>
     </div>
   );
-};
-
-RegistrationTable.propTypes = {
-  teachings: PropTypes.array.isRequired,
 };
 
 export default RegistrationTable;

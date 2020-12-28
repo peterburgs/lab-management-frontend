@@ -1,4 +1,9 @@
-import { Grid, Snackbar, IconButton, Typography } from "@material-ui/core";
+import {
+  Grid,
+  Snackbar,
+  IconButton,
+  Typography,
+} from "@material-ui/core";
 import React, { useState, useEffect, useCallback } from "react";
 import RegistrationTable from "./RegistrationTable/RegistrationTable";
 import RegistrationDialog from "./RegistrationDialog/RegistrationDialog";
@@ -10,13 +15,22 @@ import {
   fetchSemesterRefreshed,
   closeRegistration,
   closeRegistrationRefreshed,
+  setRegistrationToGenerate,
 } from "./RegistrationSlice";
+import {
+  setTeachingIdToEdit,
+  setTeachingIdToDelete,
+  deleteTeaching,
+  deleteTeachingRefreshed,
+} from "../LecturerRegistration/LecturerRegistrationSlice";
 import { unwrapResult } from "@reduxjs/toolkit";
 import Spinner from "../../components/Spinner/Spinner";
 import Semester from "../../components/Semester/Semester";
 import RegistrationToolbar from "../../components/RegistrationToolbar/RegistrationToolbar";
 import RefreshIcon from "@material-ui/icons/Refresh";
+import TeachingDialog from "../LecturerRegistration/TeachingDialog/TeachingDialog";
 import _ from "lodash";
+import GenerateScheduleDialog from "./GenerateScheduleDialog/GenerateScheduleDialog";
 
 const secondsToDhms = (seconds) => {
   seconds = Number(seconds);
@@ -90,19 +104,61 @@ const useCloseRegistration = () => {
   ];
 };
 
+const useDeleteTeaching = () => {
+  const dispatch = useDispatch();
+
+  const deleteTeachingStatus = useSelector(
+    (state) => state.lecturerRegistration.deleteTeachingStatus
+  );
+  const deleteTeachingError = useSelector(
+    (state) => state.lecturerRegistration.deleteTeachingError
+  );
+
+  const handleDeleteTeaching = async (teachingId) => {
+    try {
+      const deleteTeachingRes = await dispatch(
+        deleteTeaching(teachingId)
+      );
+      unwrapResult(deleteTeachingRes);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  return [
+    deleteTeachingStatus,
+    deleteTeachingError,
+    handleDeleteTeaching,
+  ];
+};
+
 const Registration = () => {
   const dispatch = useDispatch();
 
   // UI state
-  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(false);
-  const [openedRegistrationDialog, setOpenedRegistrationDialog] = useState(
+  const [openedConfirmDialog, setOpenedConfirmDialog] = useState(
     false
   );
-  const [openedSemesterDialog, setOpenedSemesterDialog] = useState(false);
+  const [openedTeachingDialog, setOpenedTeachingDialog] = useState(
+    false
+  );
+  const [
+    openedGenerateScheduleDialog,
+    setOpenedGenerateScheduleDialog,
+  ] = useState(false);
+  const [
+    openedRegistrationDialog,
+    setOpenedRegistrationDialog,
+  ] = useState(false);
+  const [openedSemesterDialog, setOpenedSemesterDialog] = useState(
+    false
+  );
   const [remainingTime, setRemainingTime] = useState("");
 
   // Application state
-  const semester = useSelector((state) => state.registration.semester);
+  const semester = useSelector(
+    (state) => state.registration.semester
+  );
   const openingRegistration = useSelector((state) =>
     state.registration.semester
       ? state.registration.semester.registrations.find(
@@ -110,20 +166,48 @@ const Registration = () => {
         )
       : null
   );
-  const teachings = useSelector((state) => state.registration.teachings);
+  const teachingIdToDelete = useSelector(
+    (state) => state.lecturerRegistration.teachingIdToDelete
+  );
+  const teachingIdToEdit = useSelector(
+    (state) => state.lecturerRegistration.teachingIdToEdit
+  );
 
   // Custom hook
-  const [fetchSemesterStatus, fetchSemesterError] = useFetchSemester();
+  const [
+    fetchSemesterStatus,
+    fetchSemesterError,
+  ] = useFetchSemester();
   const [
     closeRegistrationStatus,
     closeRegistrationError,
     handleCloseRegistration,
   ] = useCloseRegistration();
 
+  const [
+    deleteTeachingStatus,
+    deleteTeachingError,
+    handleDeleteTeaching,
+  ] = useDeleteTeaching();
+
   const handleClose = useCallback(async () => {
     await handleCloseRegistration();
     setOpenedConfirmDialog(false);
   }, [handleCloseRegistration]);
+
+  const handleDelete = useCallback(async () => {
+    await handleDeleteTeaching(teachingIdToDelete);
+    dispatch(setTeachingIdToDelete(null));
+  }, [handleDeleteTeaching, dispatch, teachingIdToEdit]);
+
+  const handleFinish = async (s) => {
+    setOpenedGenerateScheduleDialog(false);
+    if (s !== null) {
+      if (s.registrations.find((reg) => reg.isOpening === true)) {
+        await handleCloseRegistration();
+      }
+    }
+  };
 
   useEffect(() => {
     let interval = null;
@@ -131,7 +215,8 @@ const Registration = () => {
     if (openingRegistration) {
       interval = setInterval(() => {
         const seconds =
-          (Date.parse(openingRegistration.endDate) - new Date()) / 1000;
+          (Date.parse(openingRegistration.endDate) - new Date()) /
+          1000;
         if (seconds <= 0) {
           console.log("Close reg");
           (async () => {
@@ -148,7 +233,6 @@ const Registration = () => {
     return () => {
       clearInterval(interval);
     };
-    
   }, [openingRegistration, handleClose]);
 
   let registrationsRender = null;
@@ -178,7 +262,11 @@ const Registration = () => {
           <RegistrationTable
             title={`Registration patch ${reg.patch}`}
             isOpening={reg.isOpening}
-            teachings={teachings}
+            teachings={reg.teachings}
+            onGenerateSchedule={() => {
+              dispatch(setRegistrationToGenerate(reg._id));
+              setOpenedGenerateScheduleDialog(true);
+            }}
           />
         </div>
       ));
@@ -199,7 +287,9 @@ const Registration = () => {
         }
         autoHideDuration={6000}
         message={
-          fetchSemesterError ? fetchSemesterError : closeRegistrationError
+          fetchSemesterError
+            ? fetchSemesterError
+            : closeRegistrationError
         }
         action={
           <React.Fragment>
@@ -218,6 +308,38 @@ const Registration = () => {
             </IconButton>
           </React.Fragment>
         }
+      />
+      <TeachingDialog
+        isOpen={teachingIdToEdit ? true : openedTeachingDialog}
+        onCancel={() => {
+          teachingIdToEdit
+            ? dispatch(setTeachingIdToEdit(null))
+            : setOpenedTeachingDialog(false);
+        }}
+        onFinish={() => {
+          teachingIdToEdit
+            ? dispatch(setTeachingIdToEdit(null))
+            : setOpenedTeachingDialog(false);
+        }}
+      />
+      <GenerateScheduleDialog
+        isOpen={openedGenerateScheduleDialog}
+        onCancel={() => setOpenedGenerateScheduleDialog(false)}
+        onFinish={() => handleFinish(semester)}
+      />
+      <ConfirmDialog
+        isOpen={Boolean(teachingIdToDelete)}
+        onCancel={() => dispatch(setTeachingIdToDelete(null))}
+        onSubmit={handleDelete}
+        onLoading={deleteTeachingStatus === "loading"}
+        onClose={() => dispatch(deleteTeachingRefreshed())}
+        error={deleteTeachingError}
+        success={
+          deleteTeachingStatus === "succeeded"
+            ? "Delete Teaching successfully"
+            : null
+        }
+        title="Do you want to delete the teaching?"
       />
       <RegistrationDialog
         isOpen={openedRegistrationDialog}
@@ -243,7 +365,8 @@ const Registration = () => {
         }
         title="Do you want to close the registration?"
       />
-      {fetchSemesterStatus === "loading" || fetchSemesterStatus === "failed" ? (
+      {fetchSemesterStatus === "loading" ||
+      fetchSemesterStatus === "failed" ? (
         <div style={{ paddingTop: "5rem" }}>
           <Spinner />
         </div>
@@ -265,8 +388,12 @@ const Registration = () => {
               <RegistrationToolbar
                 remainingTime={remainingTime}
                 openingRegistration={openingRegistration}
-                onOpenRegistration={() => setOpenedRegistrationDialog(true)}
-                onCloseRegistration={() => setOpenedConfirmDialog(true)}
+                onOpenRegistration={() =>
+                  setOpenedRegistrationDialog(true)
+                }
+                onCloseRegistration={() =>
+                  setOpenedConfirmDialog(true)
+                }
                 closeRegistrationStatus={closeRegistrationStatus}
               />
             ) : null}
