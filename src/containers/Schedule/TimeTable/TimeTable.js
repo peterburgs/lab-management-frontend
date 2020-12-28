@@ -24,7 +24,7 @@ const TimeTable = (props) => {
 
   const labHeadCells = [
     {
-      id: "lab",
+      id: "labName",
       label: "Lab",
     },
   ];
@@ -69,31 +69,49 @@ const TimeTable = (props) => {
   };
 
   const renderLabs = (labs) => {
-    labs = _.cloneDeep(labs).sort();
-
+    labs = _.cloneDeep(labs).sort(function (a, b) {
+      if (a.capacity < b.capacity) return 1;
+      if (a.capacity > b.capacity) return -1;
+      return 0;
+    });
+    console.log(labs);
     return labs.map((lab) => (
-      <TableRow key={lab.id}>
+      <TableRow key={lab._id}>
         <TableCell className={classes.labCell} size="small">
-          <Lab name={lab.name} />
+          <Lab name={lab.labName} />
         </TableCell>
       </TableRow>
     ));
   };
 
-  const findLabUsage = (labUsages, dayOfWeek, labName, shift) => {
+  const findLabUsage = (
+    labUsages,
+    dayOfWeek,
+    labName,
+    shift,
+    week
+  ) => {
     return labUsages.find(
       (labUsage) =>
-        labUsage.lab === labName &&
-        labUsage.dayOfWeek === dayOfWeek &&
-        convertPeriodToShift(labUsage.startPeriod, labUsage.endPeriod) === shift
+        labUsage.lab.labName === labName &&
+        labUsage.teaching.dayOfWeek === dayOfWeek &&
+        labUsage.weekNo === week &&
+        convertPeriodToShift(
+          labUsage.startPeriod,
+          labUsage.endPeriod
+        ) === shift
     );
   };
 
-  const renderLabUsages = (labUsages, labs) => {
-    labs = _.cloneDeep(labs).sort();
+  const renderLabUsages = (labUsages, labs, week) => {
+    labs = _.cloneDeep(labs).sort(function (a, b) {
+      if (a.capacity < b.capacity) return 1;
+      if (a.capacity > b.capacity) return -1;
+      return 0;
+    });
     return labs.map((lab) => {
       return (
-        <TableRow key={lab.id}>
+        <TableRow key={lab._id}>
           {[...Array(6)].map((_, index) => {
             return (
               <TableCell
@@ -101,78 +119,168 @@ const TimeTable = (props) => {
                 className={classes.dayCell}
                 size="small"
                 padding={"default"}
-                key={lab.id + index}
+                key={lab._id + index}
                 // Important code
                 style={{ minWidth: 420 }}
               >
                 <Grid container spacing={0}>
                   <Grid item xs={4}>
-                    {findLabUsage(labUsages, index, lab.name, 1) ? (
+                    {findLabUsage(
+                      labUsages,
+                      index,
+                      lab.labName,
+                      1,
+                      week
+                    ) ? (
                       <Usage
                         courseName={
-                          findLabUsage(labUsages, index, lab.name, 1).courseName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            1,
+                            week
+                          ).teaching.course.courseName
                         }
                         lecturerName={
-                          findLabUsage(labUsages, index, lab.name, 1)
-                            .lecturerName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            1,
+                            week
+                          ).teaching.user.fullName
                         }
                         startPeriod={
-                          findLabUsage(labUsages, index, lab.name, 1)
-                            .startPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            1,
+                            week
+                          ).startPeriod
                         }
                         endPeriod={
-                          findLabUsage(labUsages, index, lab.name, 1).endPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            1,
+                            week
+                          ).endPeriod
                         }
                         index={1}
                       />
                     ) : (
-                      <div style={{ minWidth: 132, minHeight: 140 }}></div>
+                      <div
+                        style={{ minWidth: 132, minHeight: 140 }}
+                      ></div>
                     )}
                   </Grid>
                   <Grid item xs={4}>
-                    {findLabUsage(labUsages, index, lab.name, 2) ? (
+                    {findLabUsage(
+                      labUsages,
+                      index,
+                      lab.labName,
+                      2,
+                      week
+                    ) ? (
                       <Usage
                         courseName={
-                          findLabUsage(labUsages, index, lab.name, 2).courseName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            2,
+                            week
+                          ).teaching.course.courseName
                         }
                         lecturerName={
-                          findLabUsage(labUsages, index, lab.name, 2)
-                            .lecturerName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            2,
+                            week
+                          ).teaching.user.fullName
                         }
                         startPeriod={
-                          findLabUsage(labUsages, index, lab.name, 2)
-                            .startPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            2,
+                            week
+                          ).startPeriod
                         }
                         endPeriod={
-                          findLabUsage(labUsages, index, lab.name, 2).endPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            2,
+                            week
+                          ).endPeriod
                         }
                         index={2}
                       />
                     ) : (
-                      <div style={{ minWidth: 132, minHeight: 140 }}></div>
+                      <div
+                        style={{ minWidth: 132, minHeight: 140 }}
+                      ></div>
                     )}
                   </Grid>
                   <Grid item xs={4}>
-                    {findLabUsage(labUsages, index, lab.name, 3) ? (
+                    {findLabUsage(
+                      labUsages,
+                      index,
+                      lab.labName,
+                      3,
+                      week
+                    ) ? (
                       <Usage
                         courseName={
-                          findLabUsage(labUsages, index, lab.name, 3).courseName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            3,
+                            week
+                          ).teaching.course.courseName
                         }
                         lecturerName={
-                          findLabUsage(labUsages, index, lab.name, 3)
-                            .lecturerName
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            3,
+                            week
+                          ).teaching.user.fullName
                         }
                         startPeriod={
-                          findLabUsage(labUsages, index, lab.name, 3)
-                            .startPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            3,
+                            week
+                          ).startPeriod
                         }
                         endPeriod={
-                          findLabUsage(labUsages, index, lab.name, 3).endPeriod
+                          findLabUsage(
+                            labUsages,
+                            index,
+                            lab.labName,
+                            3,
+                            week
+                          ).endPeriod
                         }
                         index={3}
                       />
                     ) : (
-                      <div style={{ minWidth: 132, minHeight: 140 }}></div>
+                      <div
+                        style={{ minWidth: 132, minHeight: 140 }}
+                      ></div>
                     )}
                   </Grid>
                 </Grid>
@@ -192,7 +300,10 @@ const TimeTable = (props) => {
   };
 
   useEffect(() => {
-    scrollableNodeRef.current.addEventListener("scroll", handleOnScroll);
+    scrollableNodeRef.current.addEventListener(
+      "scroll",
+      handleOnScroll
+    );
   }, []);
 
   return (
@@ -211,7 +322,11 @@ const TimeTable = (props) => {
             <TableHead>
               <TableRow>
                 {labHeadCells.map((headCell) => (
-                  <TableCell size="small" key={headCell.id} align={"center"}>
+                  <TableCell
+                    size="small"
+                    key={headCell.id}
+                    align={"center"}
+                  >
                     {headCell.label}
                   </TableCell>
                 ))}
@@ -233,7 +348,10 @@ const TimeTable = (props) => {
                       size="small"
                       key={headCell.id}
                       align={"center"}
-                      style={{ borderLeft: "1px solid rgba(0,0,0,0.1)", zIndex: 1100 }}
+                      style={{
+                        borderLeft: "1px solid rgba(0,0,0,0.1)",
+                        zIndex: 1100,
+                      }}
                     >
                       {headCell.label}
                     </TableCell>
@@ -241,7 +359,11 @@ const TimeTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {renderLabUsages(props.labUsages, props.labs)}
+                {renderLabUsages(
+                  props.labUsages,
+                  props.labs,
+                  props.week
+                )}
               </TableBody>
             </Table>
           </SimpleBar>

@@ -97,7 +97,8 @@ const Auth = () => {
   );
 
   const handleAuthError = useCallback((res) => {
-    setAuthError(res);
+    console.log(res);
+    setAuthError(res.error);
   }, []);
 
   const handleClose = useCallback(() => {
