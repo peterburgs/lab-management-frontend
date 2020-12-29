@@ -9,8 +9,12 @@ import {
   Grid,
   Toolbar,
   Typography,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select,
 } from "@material-ui/core";
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import useStyles from "./TimeTable.styles";
 import Lab from "../../../components/Lab/Lab";
 import Usage from "../../../components/Usage/Usage";
@@ -18,9 +22,14 @@ import PropTypes from "prop-types";
 import _ from "lodash";
 import SimpleBar from "simplebar-react";
 import "simplebar/dist/simplebar.min.css";
+import { useSelector } from "react-redux";
 
 const TimeTable = (props) => {
   const classes = useStyles();
+  const [week, setWeek] = useState(0);
+  const semester = useSelector(
+    (state) => state.registration.semester
+  );
 
   const labHeadCells = [
     {
@@ -133,6 +142,7 @@ const TimeTable = (props) => {
                       week
                     ) ? (
                       <Usage
+                        disableActions={userRole === "LECTURER"}
                         courseName={
                           findLabUsage(
                             labUsages,
@@ -186,6 +196,7 @@ const TimeTable = (props) => {
                       week
                     ) ? (
                       <Usage
+                        disableActions={userRole === "LECTURER"}
                         courseName={
                           findLabUsage(
                             labUsages,
@@ -239,6 +250,7 @@ const TimeTable = (props) => {
                       week
                     ) ? (
                       <Usage
+                        disableActions={userRole === "LECTURER"}
                         courseName={
                           findLabUsage(
                             labUsages,
@@ -299,6 +311,8 @@ const TimeTable = (props) => {
     labTableRef.current.scrollTop = e.target.scrollTop;
   };
 
+  const userRole = useSelector((state) => state.auth.userRole);
+
   useEffect(() => {
     scrollableNodeRef.current.addEventListener(
       "scroll",
@@ -309,13 +323,52 @@ const TimeTable = (props) => {
   return (
     <Paper className={classes.timeTable}>
       <Toolbar className={classes.toolBar}>
-        <Typography variant="h6" component="div">
-          Schedule
+        <Typography component="div">Week</Typography>
+
+        <FormControl style={{ marginLeft: 15, marginRight: 15 }}>
+          {/* <InputLabel
+            style={{ color: "#0a043c" }}
+            id="demo-simple-select-outlined-label"
+          >
+            Week
+          </InputLabel> */}
+          <Select
+            style={{ color: "#0a043c" }}
+            labelId="demo-simple-select-outlined-label"
+            id="demo-simple-select-outlined"
+            value={week}
+            onChange={(e) => setWeek(e.target.value)}
+            label="Week"
+          >
+            {semester
+              ? [...Array(semester.numberOfWeeks)].map((e, i) => (
+                  <MenuItem key={"abc" + i} value={i}>
+                    {i}
+                  </MenuItem>
+                ))
+              : null}
+          </Select>
+        </FormControl>
+        <Typography style={{ color: "#0a043c" }}>
+          From&nbsp;
+        </Typography>
+        <Typography style={{ color: "#ef4f4f" }}>
+          Oct 1st, 2020
+        </Typography>
+        <Typography style={{ color: "#0a043c" }}>
+          &nbsp;to&nbsp;
+        </Typography>
+        <Typography style={{ color: "#ef4f4f" }}>
+          Oct 2nd, 2020
         </Typography>
       </Toolbar>
       <Paper className={classes.paper}>
         <TableContainer
-          style={{ width: 100, maxHeight: 520, overflowY: "hidden" }}
+          style={{
+            width: 100,
+            maxHeight: "70vh",
+            overflowY: "hidden",
+          }}
           ref={labTableRef}
         >
           <Table stickyHeader>
@@ -323,6 +376,7 @@ const TimeTable = (props) => {
               <TableRow>
                 {labHeadCells.map((headCell) => (
                   <TableCell
+                    style={{ color: "#393e46", fontWeight: "bold" }}
                     size="small"
                     key={headCell.id}
                     align={"center"}
@@ -338,7 +392,7 @@ const TimeTable = (props) => {
         <TableContainer>
           <SimpleBar
             scrollableNodeProps={{ ref: scrollableNodeRef }}
-            style={{ maxHeight: 520 }}
+            style={{ maxHeight: "70vh" }}
           >
             <Table stickyHeader>
               <TableHead>
@@ -351,6 +405,8 @@ const TimeTable = (props) => {
                       style={{
                         borderLeft: "1px solid rgba(0,0,0,0.1)",
                         zIndex: 1100,
+                        color: "#393e46",
+                        fontWeight: "bold",
                       }}
                     >
                       {headCell.label}
@@ -359,11 +415,7 @@ const TimeTable = (props) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {renderLabUsages(
-                  props.labUsages,
-                  props.labs,
-                  props.week
-                )}
+                {renderLabUsages(props.labUsages, props.labs, week)}
               </TableBody>
             </Table>
           </SimpleBar>

@@ -24,10 +24,10 @@ export default makeStyles({
     },
   },
   active: {
-    color: "#669DF6",
-    background: "#476282",
+    color: "#32e0c4",
+    // background: "#476282",
     "& svg": {
-      fill: "#669DF6",
+      fill: "#32e0c4",
     },
   },
 });

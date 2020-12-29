@@ -10,6 +10,8 @@ import {
 } from "@material-ui/core";
 import useStyles from "./Schedule.styles";
 import AddIcon from "@material-ui/icons/Add";
+import EmojiPeopleIcon from "@material-ui/icons/EmojiPeople";
+import SendRoundedIcon from "@material-ui/icons/SendRounded";
 import ImportExportIcon from "@material-ui/icons/ImportExport";
 import TimeTable from "./TimeTable/TimeTable";
 import LabUsageDialog from "./LabUsageDialog/LabUsageDialog";
@@ -90,7 +92,6 @@ const useFetchSemester = () => {
 //
 const Schedule = () => {
   const classes = useStyles();
-  const [week, setWeek] = useState(0);
   const [openedLabUsageDialog, setOpenedLabUsageDialog] = useState(
     false
   );
@@ -102,6 +103,7 @@ const Schedule = () => {
   ] = useFetchSemester();
 
   const labs = useSelector((state) => state.labs.labs);
+  const userRole = useSelector((state) => state.auth.userRole);
 
   const semester = useSelector(
     (state) => state.registration.semester
@@ -153,15 +155,27 @@ const Schedule = () => {
             lg={7}
           >
             <Grid item xs={12} sm={"auto"}>
-              <Button
-                className={classes.button}
-                variant="contained"
-                color="primary"
-                startIcon={<AddIcon />}
-                onClick={handleAddLabUsageButtonClick}
-              >
-                Add lab usage
-              </Button>
+              {userRole === "LECTURER" ? (
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  color="primary"
+                  startIcon={<EmojiPeopleIcon />}
+                  onClick={handleAddLabUsageButtonClick}
+                >
+                  Raise Request
+                </Button>
+              ) : (
+                <Button
+                  className={classes.button}
+                  variant="contained"
+                  color="primary"
+                  startIcon={<AddIcon />}
+                  onClick={handleAddLabUsageButtonClick}
+                >
+                  Add extra class
+                </Button>
+              )}
             </Grid>
             <Grid item xs={12} sm={"auto"}>
               <Button
@@ -185,7 +199,7 @@ const Schedule = () => {
             </Grid>
           </Grid>
           <Grid className={classes.toolbarRight} item lg={5}>
-            <FormControl>
+            {/* <FormControl>
               <InputLabel
                 style={{ color: "white" }}
                 id="demo-simple-select-outlined-label"
@@ -208,19 +222,19 @@ const Schedule = () => {
                     ))
                   : null}
               </Select>
-            </FormControl>
-            <Typography style={{ color: "white" }}>From</Typography>
+            </FormControl> */}
+            {/* <Typography style={{ color: "white" }}>From</Typography>
             <Typography style={{ color: "white" }}>
               Oct 1st, 2020
             </Typography>
             <Typography style={{ color: "white" }}>to</Typography>
             <Typography style={{ color: "white" }}>
               Oct 2nd, 2020
-            </Typography>
+            </Typography> */}
           </Grid>
         </Grid>
         <Grid item xs={11}>
-          <TimeTable week={week} labs={labs} labUsages={labUsages} />
+          <TimeTable labs={labs} labUsages={labUsages} />
         </Grid>
       </Grid>
     </div>

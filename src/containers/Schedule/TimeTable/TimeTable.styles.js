@@ -23,5 +23,7 @@ export default makeStyles((theme) => ({
   toolBar: {
     paddingLeft: theme.spacing(2),
     paddingRight: theme.spacing(2),
+    paddingTop: 0,
+    justifyContent: "flex-end",
   },
 }));
