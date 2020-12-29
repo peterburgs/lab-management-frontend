@@ -9,13 +9,20 @@ const LabUsage = (props) => {
 
   return (
     <Paper className={classes.usage} elevation={1}>
-      <IconButton className={classes.editIcon}>
-        <MoreVertIcon fontSize={"small"} />
-      </IconButton>
-      <Typography style={{ fontSize: 13, fontWeight: 600, marginRight: '1rem' }}>
+      {!props.disableActions ? (
+        <IconButton className={classes.editIcon}>
+          <MoreVertIcon fontSize={"small"} />
+        </IconButton>
+      ) : null}
+
+      <Typography
+        style={{ fontSize: 13, fontWeight: 600, marginRight: "1rem" }}
+      >
         {props.courseName}
       </Typography>
-      <Typography style={{ fontSize: 12 }}>{props.lecturerName}</Typography>
+      <Typography style={{ fontSize: 12 }}>
+        {props.lecturerName}
+      </Typography>
       <Typography style={{ fontSize: 12 }}>
         Period: {props.startPeriod} - {props.endPeriod}
       </Typography>

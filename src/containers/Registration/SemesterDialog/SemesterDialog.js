@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +7,9 @@ import {
   DialogActions,
   Button,
   Slide,
+  FormControlLabel,
+  Checkbox,
+  Typography,
 } from "@material-ui/core";
 import { DateTimePicker } from "@material-ui/pickers";
 import useStyles from "./SemesterDialog.styles";
@@ -45,7 +48,11 @@ const useUpdateSemester = () => {
     [dispatch]
   );
 
-  return [updateSemesterStatus, updateSemesterError, handleUpdateSemester];
+  return [
+    updateSemesterStatus,
+    updateSemesterError,
+    handleUpdateSemester,
+  ];
 };
 
 // Hook to handle start semester
@@ -71,7 +78,11 @@ const useStartSemester = () => {
     [dispatch]
   );
 
-  return [startSemesterStatus, startSemesterError, handleStartSemester];
+  return [
+    startSemesterStatus,
+    startSemesterError,
+    handleStartSemester,
+  ];
 };
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -81,6 +92,9 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const SemesterDialog = (props) => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  const [isEditNumberOfWeeks, setIsEditNumberOfWeeks] = useState(
+    false
+  );
   const { register, handleSubmit, errors, control } = useForm();
   const [
     updateSemesterStatus,
@@ -94,7 +108,9 @@ const SemesterDialog = (props) => {
     handleStartSemester,
   ] = useStartSemester();
 
-  const semester = useSelector((state) => state.registration.semester);
+  const semester = useSelector(
+    (state) => state.registration.semester
+  );
 
   const onSubmit = async (data) => {
     if (semester) {
@@ -117,7 +133,8 @@ const SemesterDialog = (props) => {
     <React.Fragment>
       <CustomizedSnackbar
         open={
-          updateSemesterStatus === "failed" || startSemesterStatus === "failed"
+          updateSemesterStatus === "failed" ||
+          startSemesterStatus === "failed"
             ? true
             : false
         }
@@ -186,22 +203,46 @@ const SemesterDialog = (props) => {
                 />
               )}
             />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={isEditNumberOfWeeks}
+                  onChange={(e) => {
+                    setIsEditNumberOfWeeks(e.target.checked);
+                  }}
+                />
+              }
+              label="Change Number of Weeks"
+            />
             <TextField
               id="numberOfWeeks"
               name="numberOfWeeks"
               label="Number of weeks"
               variant="outlined"
+              disabled={!isEditNumberOfWeeks}
               defaultValue={semester ? semester.numberOfWeeks : null}
               inputRef={register({ required: true })}
               className={classes.formElement}
               error={Boolean(errors.numberOfWeeks)}
               helperText={
-                errors.numberOfWeeks ? "*This field is required" : null
+                errors.numberOfWeeks
+                  ? "*This field is required"
+                  : null
               }
             />
+            {isEditNumberOfWeeks ? (
+              <Typography style={{ color: "#ec0101", fontSize: 13 }}>
+                The existing schedule will be removed due to this
+                change!
+              </Typography>
+            ) : null}
           </DialogContent>
           <DialogActions style={{ padding: "16px 24px" }}>
-            <Button type="button" onClick={props.onCancel} color="primary">
+            <Button
+              type="button"
+              onClick={props.onCancel}
+              color="primary"
+            >
               Cancel
             </Button>
             <div style={{ position: "relative" }}>

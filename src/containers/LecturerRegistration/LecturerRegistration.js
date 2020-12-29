@@ -236,7 +236,9 @@ const LecturerRegistration = () => {
     />
   ) : (
     <Paper component="form" className={classes.paper}>
-      <Typography>There is no registration</Typography>
+      <Typography className={classes.text}>
+        No Registration is available at this time!
+      </Typography>
     </Paper>
   );
 

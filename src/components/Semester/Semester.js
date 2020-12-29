@@ -1,5 +1,10 @@
 import React from "react";
-import { Typography, IconButton, Grid, Button } from "@material-ui/core";
+import {
+  Typography,
+  IconButton,
+  Grid,
+  Button,
+} from "@material-ui/core";
 import useStyles from "./Semester.styles";
 import EditIcon from "@material-ui/icons/Edit";
 
@@ -26,16 +31,15 @@ const Semester = (props) => {
           style={{
             color: "rgba(255, 255, 255, 0.7)",
             fontSize: 14,
-            fontWeight: 600,
           }}
         >
-          Start date: {new Date(props.semester.startDate).toLocaleString()}
+          Start date:{" "}
+          {new Date(props.semester.startDate).toLocaleString()}
         </Typography>
         <Typography
           style={{
             color: "rgba(255, 255, 255, 0.7)",
             fontSize: 14,
-            fontWeight: 600,
           }}
         >
           Number of weeks: {props.semester.numberOfWeeks}
@@ -48,10 +52,18 @@ const Semester = (props) => {
         <Grid
           item
           xs={10}
-          style={{ display: "flex", justifyContent: "center", padding: "5rem" }}
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            padding: "5rem",
+          }}
         >
           <Button
-            style={{ borderRadius: 8, fontSize: 16, textTransform: "none" }}
+            style={{
+              borderRadius: 8,
+              fontSize: 16,
+              textTransform: "none",
+            }}
             onClick={props.onStart}
             variant="contained"
             color="secondary"

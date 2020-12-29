@@ -5,10 +5,11 @@ export default makeStyles((theme) => ({
     paddingTop: 24,
   },
   paper: {
-    borderRadius: 8,
+    borderRadius: 10,
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    padding: 10,
   },
   dialog: {
     borderRadius: 16,
@@ -19,5 +20,9 @@ export default makeStyles((theme) => ({
   },
   iconButton: {
     padding: 10,
+  },
+  text: {
+    fontSize: 20,
+    color: "#ef4f4f",
   },
 }));
