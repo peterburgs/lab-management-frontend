@@ -260,7 +260,7 @@ const Registration = () => {
             </Typography>
           )}
           <RegistrationTable
-            title={`Registration patch ${reg.patch}`}
+            title={`Registration batch ${reg.patch}`}
             isOpening={reg.isOpening}
             teachings={reg.teachings}
             onGenerateSchedule={() => {
