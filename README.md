@@ -1,1 +1,1 @@
-# Lab Management Frontend
+# Lab Management for Web platform
